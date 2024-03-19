@@ -1,0 +1,23 @@
+vich_uploader:
+  db_driver: orm
+
+  mappings:
+    category_image:
+      uri_prefix: /images/categories
+      upload_destination: "%kernel.project_dir%/public/images/categories"
+      #namer: Vich\UploaderBundle\Naming\UniqidNamer
+    pictogram_image:
+      uri_prefix: /images/pictograms
+      upload_destination: "%kernel.project_dir%/public/images/pictograms"
+      #namer: Vich\UploaderBundle\Naming\UniqidNamer
+    subcategory_image:
+      uri_prefix: /images/sous-categories
+      upload_destination: "%kernel.project_dir%/public/images/sous-categories"
+      #namer: Vich\UploaderBundle\Naming\UniqidNamer
+
+
+    #mappings:
+    #    products:
+    #        uri_prefix: /images/products
+    #        upload_destination: '%kernel.project_dir%/public/images/products'
+    #        namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
