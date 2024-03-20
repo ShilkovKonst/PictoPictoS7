@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PictogramRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
@@ -29,16 +31,26 @@ class Pictogram
     #[Groups(['pictogram'])]
     private ?string $filename;
 
-    #[Assert\Image(mimeTypes: "image/png")]
+    #[Assert\Image(mimeTypes: ["image/png"])]
     #[Vich\UploadableField(mapping: "category_image", fileNameProperty: "filename")]
     private ?File $illustration;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $update_at;
+    private ?\DateTimeInterface $updatedAt;
 
     #[ORM\ManyToOne(inversedBy: 'pictograms')]
     #[Groups(['pictogram'])]
     private ?Category $category;
+
+    #[ORM\ManyToOne(inversedBy: 'pictograms')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?SubCategory $subCategory;
+
+    #[ORM\ManyToOne(inversedBy: 'pictograms')]
+    private ?Therapist $therapist;
+
+    #[ORM\ManyToMany(targetEntity: Sentence::class, mappedBy: 'pictograms')]
+    private Collection $sentences;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['pictogram'])]
@@ -136,12 +148,10 @@ class Pictogram
     #[Groups(['pictogram'])]
     private ?string $trois_pers_plur_passe;
 
-    #[ORM\ManyToOne(inversedBy: 'pictograms_id')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?SubCategory $subcategory_id = null;
-
-    #[ORM\ManyToOne(inversedBy: 'pictograms')]
-    private ?Therapist $therapist = null;
+    public function __construct()
+    {
+        $this->sentences = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -188,20 +198,20 @@ class Pictogram
     {
         $this->illustration = $illustration;
         if ($this->illustration instanceof UploadedFile) {
-            $this->update_at = new \DateTime('now');
+            $this->updatedAt = new \DateTime('now');
         }
 
         return $this;
     }
 
-    public function getUpdateAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->update_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdateAt(\DateTimeInterface $update_at): self
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
-        $this->update_at = $update_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -506,14 +516,14 @@ class Pictogram
         return $this;
     }
 
-    public function getSubcategoryId(): ?SubCategory
+    public function getSubCategory(): ?SubCategory
     {
-        return $this->subcategory_id;
+        return $this->subCategory;
     }
 
-    public function setSubcategoryId(?SubCategory $subcategory_id): self
+    public function setSubCategory(?SubCategory $subCategory): self
     {
-        $this->subcategory_id = $subcategory_id;
+        $this->subCategory = $subCategory;
 
         return $this;
     }
@@ -523,9 +533,36 @@ class Pictogram
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function setTherapist(?Therapist $therapist):self
     {
         $this->therapist = $therapist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sentence>
+     */
+    public function getSentences(): Collection
+    {
+        return $this->sentences;
+    }
+
+    public function addSentence(Sentence $sentence):self
+    {
+        if (!$this->sentences->contains($sentence)) {
+            $this->sentences->add($sentence);
+            $sentence->addPictogram($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSentence(Sentence $sentence):self
+    {
+        if ($this->sentences->removeElement($sentence)) {
+            $sentence->removePictogram($this);
+        }
 
         return $this;
     }

@@ -13,16 +13,16 @@ class Institution
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $name;
 
     #[ORM\Column(length: 255)]
-    private ?string $code = null;
+    private ?string $code;
 
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    private ?string $email;
 
     #[ORM\OneToMany(targetEntity: Therapist::class, mappedBy: 'institution')]
     private Collection $therapists;
@@ -37,7 +37,7 @@ class Institution
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(int $id):self
     {
         $this->id = $id;
 
@@ -49,7 +49,7 @@ class Institution
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name):self
     {
         $this->name = $name;
 
@@ -61,7 +61,7 @@ class Institution
         return $this->code;
     }
 
-    public function setCode(string $code): static
+    public function setCode(string $code):self
     {
         $this->code = $code;
 
@@ -73,7 +73,7 @@ class Institution
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email):self
     {
         $this->email = $email;
 
@@ -88,7 +88,7 @@ class Institution
         return $this->therapists;
     }
 
-    public function addTherapists(Therapist $therapist): static
+    public function addTherapists(Therapist $therapist):self
     {
         if (!$this->therapists->contains($therapist)) {
             $this->therapists->add($therapist);
@@ -98,7 +98,7 @@ class Institution
         return $this;
     }
 
-    public function removeTherapist(Therapist $therapist): static
+    public function removeTherapist(Therapist $therapist):self
     {
         if ($this->therapists->removeElement($therapist)) {
             // set the owning side to null (unless already changed)

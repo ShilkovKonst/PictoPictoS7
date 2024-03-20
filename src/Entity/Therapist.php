@@ -6,7 +6,6 @@ use App\Repository\TherapistRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: TherapistRepository::class)]
 class Therapist //  implements UserInterface ??? why?
@@ -14,7 +13,7 @@ class Therapist //  implements UserInterface ??? why?
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id;
 
     #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
     private Collection $pictograms;
@@ -29,23 +28,23 @@ class Therapist //  implements UserInterface ??? why?
     private Collection $notes;
 
     #[ORM\ManyToOne(inversedBy: 'therapist')]
-    private ?Institution $institution = null;
+    private ?Institution $institution;
 
-
-    #[ORM\Column(length: 255)]
-    private ?string $firstName = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $lastName = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $email = null;
+    private ?string $firstName;
+
+    #[ORM\Column(length: 100)]
+    private ?string $lastName;
+
+    #[ORM\Column(length: 100)]
+    private ?string $email;
 
     #[ORM\Column(length: 50)]
-    private ?string $password = null;
+    private ?string $password;
 
-    #[ORM\Column(length: 255)]
-    private ?string $job = null;
+    #[ORM\Column(length: 100)]
+    private ?string $job;
 
     #[ORM\Column]
     private array $roles = [];
@@ -240,7 +239,7 @@ class Therapist //  implements UserInterface ??? why?
         return $this->notes;
     }
 
-    public function addNote(Note $note): static
+    public function addNote(Note $note): self
     {
         if (!$this->notes->contains($note)) {
             $this->notes->add($note);
@@ -250,7 +249,7 @@ class Therapist //  implements UserInterface ??? why?
         return $this;
     }
 
-    public function removeNote(Note $note): static
+    public function removeNote(Note $note): self
     {
         if ($this->notes->removeElement($note)) {
             // set the owning side to null (unless already changed)
@@ -267,7 +266,7 @@ class Therapist //  implements UserInterface ??? why?
         return $this->institution;
     }
 
-    public function setInstitution(?Institution $institution): static
+    public function setInstitution(?Institution $institution): self
     {
         $this->institution = $institution;
 

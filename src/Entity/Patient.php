@@ -14,19 +14,19 @@ class Patient
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id;
 
-    #[ORM\Column(length: 255)]
-    private ?string $firstName = null;
+    #[ORM\Column(length: 100)]
+    private ?string $firstName;
 
-    #[ORM\Column(length: 255)]
-    private ?string $lastName = null;
+    #[ORM\Column(length: 100)]
+    private ?string $lastName;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $birthDate = null;
+    private ?\DateTimeInterface $birthDate;
 
-    #[ORM\Column(length: 255)]
-    private ?string $schoolGrade = null;
+    #[ORM\Column(length: 100)]
+    private ?string $schoolGrade;
 
     #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'patient')]
     private Collection $notes;
@@ -34,9 +34,13 @@ class Patient
     #[ORM\Column]
     private array $roles = [];
 
+    #[ORM\OneToMany(targetEntity: Sentence::class, mappedBy: 'patient')]
+    private Collection $sentences;
+
     public function __construct()
     {
         $this->notes = new ArrayCollection();
+        $this->sentences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -44,7 +48,7 @@ class Patient
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -56,7 +60,7 @@ class Patient
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
 
@@ -68,7 +72,7 @@ class Patient
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): static
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -80,7 +84,7 @@ class Patient
         return $this->birthDate;
     }
 
-    public function setBirthDate(\DateTimeInterface $birthDate): static
+    public function setBirthDate(\DateTimeInterface $birthDate): self
     {
         $this->birthDate = $birthDate;
 
@@ -92,7 +96,7 @@ class Patient
         return $this->schoolGrade;
     }
 
-    public function setSchoolGrade(string $schoolGrade): static
+    public function setSchoolGrade(string $schoolGrade): self
     {
         $this->schoolGrade = $schoolGrade;
 
@@ -107,7 +111,7 @@ class Patient
         return $this->notes;
     }
 
-    public function addNote(Note $note): static
+    public function addNote(Note $note): self
     {
         if (!$this->notes->contains($note)) {
             $this->notes->add($note);
@@ -117,7 +121,7 @@ class Patient
         return $this;
     }
 
-    public function removeNote(Note $note): static
+    public function removeNote(Note $note): self
     {
         if ($this->notes->removeElement($note)) {
             // set the owning side to null (unless already changed)
@@ -134,9 +138,39 @@ class Patient
         return $this->roles;
     }
 
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sentence>
+     */
+    public function getSentences(): Collection
+    {
+        return $this->sentences;
+    }
+
+    public function addSentence(Sentence $sentence):self
+    {
+        if (!$this->sentences->contains($sentence)) {
+            $this->sentences->add($sentence);
+            $sentence->setPatient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSentence(Sentence $sentence):self
+    {
+        if ($this->sentences->removeElement($sentence)) {
+            // set the owning side to null (unless already changed)
+            if ($sentence->getPatient() === $this) {
+                $sentence->setPatient(null);
+            }
+        }
 
         return $this;
     }

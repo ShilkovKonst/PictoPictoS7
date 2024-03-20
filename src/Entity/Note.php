@@ -12,28 +12,28 @@ class Note
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $comment = null;
+    private ?string $comment;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $created_at;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Therapist $therapist = null;
+    private ?Therapist $therapist;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Patient $patient = null;
+    private ?Patient $patient;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -45,7 +45,7 @@ class Note
         return $this->comment;
     }
 
-    public function setComment(string $comment): static
+    public function setComment(string $comment): self
     {
         $this->comment = $comment;
 
@@ -57,7 +57,7 @@ class Note
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
@@ -69,7 +69,7 @@ class Note
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function setTherapist(?Therapist $therapist): self
     {
         $this->therapist = $therapist;
 
@@ -81,7 +81,7 @@ class Note
         return $this->patient;
     }
 
-    public function setPatient(?Patient $patient): static
+    public function setPatient(?Patient $patient): self
     {
         $this->patient = $patient;
 

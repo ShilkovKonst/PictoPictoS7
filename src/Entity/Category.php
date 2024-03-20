@@ -31,7 +31,7 @@ class Category
     #[Groups(['category', 'pictogram', 'subcategory'])]
     private ?string $filename;
 
-    #[Assert\Image(mimeTypes: "image/png")]
+    #[Assert\Image(mimeTypes: ["image/png"])]
     #[Vich\UploadableField(mapping: "category_image", fileNameProperty: "filename")]
     private ?File $illustration;
 
@@ -46,12 +46,16 @@ class Category
 
     #[ORM\ManyToOne(inversedBy: 'categories')]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Therapist $therapist = null;
+    private ?Therapist $therapist;
+
+    #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'category')]
+    private Collection $questions;
 
     public function __construct()
     {
         $this->pictograms = new ArrayCollection();
         $this->subCategories = new ArrayCollection();
+        $this->questions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -125,7 +129,7 @@ class Category
         return $this->pictograms;
     }
 
-    public function addPictogram(Pictogram $pictogram): static
+    public function addPictogram(Pictogram $pictogram):self
     {
         if (!$this->pictograms->contains($pictogram)) {
             $this->pictograms->add($pictogram);
@@ -135,7 +139,7 @@ class Category
         return $this;
     }
 
-    public function removePictogram(Pictogram $pictogram): static
+    public function removePictogram(Pictogram $pictogram):self
     {
         if ($this->pictograms->removeElement($pictogram)) {
             // set the owning side to null (unless already changed)
@@ -155,7 +159,7 @@ class Category
         return $this->subCategories;
     }
 
-    public function addSubCategory(SubCategory $subCategory): static
+    public function addSubCategory(SubCategory $subCategory):self
     {
         if (!$this->subCategories->contains($subCategory)) {
             $this->subCategories->add($subCategory);
@@ -165,7 +169,7 @@ class Category
         return $this;
     }
 
-    public function removeSubCategory(SubCategory $subCategory): static
+    public function removeSubCategory(SubCategory $subCategory):self
     {
         if ($this->subCategories->removeElement($subCategory)) {
             // set the owning side to null (unless already changed)
@@ -182,9 +186,36 @@ class Category
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function setTherapist(?Therapist $therapist):self
     {
         $this->therapist = $therapist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question):self
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->addCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuestion(Question $question):self
+    {
+        if ($this->questions->removeElement($question)) {
+            $question->removeCategory($this);
+        }
 
         return $this;
     }

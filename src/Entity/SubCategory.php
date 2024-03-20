@@ -30,9 +30,9 @@ class SubCategory
     #[Groups(['pictogram', 'subcategory'])]
     private ?string $filename;
 
-    #[Assert\Image(mimeTypes: 'image/png')]
+    #[Assert\Image(mimeTypes: ['image/png'])]
     #[Vich\UploadableField(mapping: 'category_image', fileNameProperty: 'filename')]
-    private ?File $subillustration;
+    private ?File $subIllustration;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $update_at;
@@ -40,17 +40,17 @@ class SubCategory
     #[ORM\ManyToOne(inversedBy: 'subCategories')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['pictogram', 'subcategory'])]
-    private ?Category $category_id;
+    private ?Category $category;
 
     #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'subcategory_id')]
-    private Collection $pictograms_id;
+    private Collection $pictograms;
 
     #[ORM\ManyToOne(inversedBy: 'subCategories')]
-    private ?Therapist $therapist = null;
+    private ?Therapist $therapist;
 
     public function __construct()
     {
-        $this->pictograms_id = new ArrayCollection();
+        $this->pictograms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,14 +89,14 @@ class SubCategory
         return $this;
     }
 
-    public function getSubillustration(): ?File
+    public function getSubIllustration(): ?File
     {
-        return $this->subillustration;
+        return $this->subIllustration;
     }
 
-    public function setSubillustration(File $subillustration): self
+    public function setSubIllustration(File $subIllustration): self
     {
-        $this->subillustration = $subillustration;
+        $this->subIllustration = $subIllustration;
 
         return $this;
     }
@@ -115,12 +115,12 @@ class SubCategory
 
     public function getCategoryId(): ?Category
     {
-        return $this->category_id;
+        return $this->category;
     }
 
-    public function setCategoryId(?Category $category_id): self
+    public function setCategoryId(?Category $category): self
     {
-        $this->category_id = $category_id;
+        $this->category = $category;
 
         return $this;
     }
@@ -128,27 +128,27 @@ class SubCategory
     /**
      * @return Collection<int, Pictogram>
      */
-    public function getPictogramsId(): Collection
+    public function getPictograms(): Collection
     {
-        return $this->pictograms_id;
+        return $this->pictograms;
     }
 
-    public function addPictogramsId(Pictogram $pictogramsId): self
+    public function addPictograms(Pictogram $pictogramId): self
     {
-        if (!$this->pictograms_id->contains($pictogramsId)) {
-            $this->pictograms_id->add($pictogramsId);
-            $pictogramsId->setSubcategoryId($this);
+        if (!$this->pictograms->contains($pictogramId)) {
+            $this->pictograms->add($pictogramId);
+            $pictogramId->setSubcategory($this);
         }
 
         return $this;
     }
 
-    public function removePictogramsId(Pictogram $pictogramsId): self
+    public function removePictograms(Pictogram $pictogramId): self
     {
-        if ($this->pictograms_id->removeElement($pictogramsId)) {
+        if ($this->pictograms->removeElement($pictogramId)) {
             // set the owning side to null (unless already changed)
-            if ($pictogramsId->getSubcategoryId() === $this) {
-                $pictogramsId->setSubcategoryId(null);
+            if ($pictogramId->getSubcategory() === $this) {
+                $pictogramId->setSubcategory(null);
             }
         }
 
@@ -160,7 +160,7 @@ class SubCategory
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function setTherapist(?Therapist $therapist):self
     {
         $this->therapist = $therapist;
 
