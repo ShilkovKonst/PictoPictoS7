@@ -1,0 +1,21 @@
+<div class="flex justify-center items-center flex-col w-full h-full" id="a-form">
+    <h2 class="switch__title text-4xl font-bold leading-loose">
+        Bienvenue sur <span class="text-pblue">P</span>icto<span class="text-pred">P</span>icto!
+    </h2>
+    <p class="switch__description text-sm text-center tracking-[0.25px] leading-relaxed">Destinée à développer la
+        communication à l'aide de pictogrammes,
+        l'application est réservée aux professionnels de santé qui en font la demande.</p><br>
+    <p class="switch__description text-sm text-center tracking-[0.25px] leading-relaxed">L'inscription vous
+        permettra un suivi des progrès de votre
+        patient
+        ainsi que l'intégration de nouveaux pictogrammes choisis par vos soins.</p><br>
+    <p class="switch__description text-sm text-center tracking-[0.25px] leading-relaxed">Vous n'êtes pas un
+        professionnel de santé?
+        Le mode invité vous permettra de découvrir notre application en toute liberté</p>
+    {# <a href="{{ path('guest') }}" class="switch__button button switch-btn a-button" type="button"> #}
+    <a href="{{ guest }}"
+        class="cursor-pointer transition ease-in-out dur-300 scale-100 hover:scale-95 w-44 h-12 rounded-3xl mt-12 font-bold text-sm tracking-[1.25px] bg-pbg text-[#f9f9f9] border-none outline-none switch-btn a-button"
+        type="button">
+        <p class="text-white no-underline text-center pt-3">Mode invité</p>
+    </a>
+</div>
