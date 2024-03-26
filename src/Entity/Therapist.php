@@ -6,9 +6,10 @@ use App\Repository\TherapistRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: TherapistRepository::class)]
-class Therapist //  implements UserInterface ??? why?
+class Therapist implements PasswordAuthenticatedUserInterface 
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
