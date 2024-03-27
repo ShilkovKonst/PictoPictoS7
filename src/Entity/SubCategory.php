@@ -32,7 +32,7 @@ class SubCategory
 
     #[Assert\Image(mimeTypes: ['image/png'])]
     #[Vich\UploadableField(mapping: 'category_image', fileNameProperty: 'filename')]
-    private ?File $subIllustration;
+    private ?File $subIllustration = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $update_at;

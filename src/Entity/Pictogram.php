@@ -33,7 +33,7 @@ class Pictogram
 
     #[Assert\Image(mimeTypes: ["image/png"])]
     #[Vich\UploadableField(mapping: "category_image", fileNameProperty: "filename")]
-    private ?File $illustration;
+    private ?File $illustration = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt;
@@ -43,7 +43,7 @@ class Pictogram
     private ?Category $category;
 
     #[ORM\ManyToOne(inversedBy: 'pictograms')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?SubCategory $subCategory;
 
     #[ORM\ManyToOne(inversedBy: 'pictograms')]

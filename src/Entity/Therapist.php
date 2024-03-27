@@ -14,7 +14,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id;
+    private ?int $id = null;
 
     #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
     private Collection $pictograms;
@@ -29,23 +29,23 @@ class Therapist implements PasswordAuthenticatedUserInterface
     private Collection $notes;
 
     #[ORM\ManyToOne(inversedBy: 'therapist')]
-    private ?Institution $institution;
+    private ?Institution $institution = null;
 
 
     #[ORM\Column(length: 100)]
-    private ?string $firstName;
+    private ?string $firstName = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $lastName;
+    private ?string $lastName = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $email;
+    private ?string $email = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $password;
+    private ?string $password = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $job;
+    private ?string $job = null;
 
     #[ORM\Column]
     private array $roles = [];
