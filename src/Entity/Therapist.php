@@ -6,15 +6,43 @@ use App\Repository\TherapistRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: TherapistRepository::class)]
-class Therapist implements PasswordAuthenticatedUserInterface 
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $email = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $job = null;
 
     #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
     private Collection $pictograms;
@@ -28,28 +56,12 @@ class Therapist implements PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'therapist')]
     private Collection $notes;
 
-    #[ORM\ManyToOne(inversedBy: 'therapist')]
+    #[ORM\ManyToOne(inversedBy: 'therapists')]
     private ?Institution $institution = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private $isVerified = false;
 
-    #[ORM\Column(length: 100)]
-    private ?string $firstName = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $lastName = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 50)]
-    private ?string $password = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $job = null;
-
-    #[ORM\Column]
-    private array $roles = [];
-    
     public function __construct()
     {
         $this->pictograms = new ArrayCollection();
@@ -63,9 +75,108 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function getEmail(): ?string
     {
-        $this->id = $id;
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     *
+     * @return list<string>
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getJob(): ?string
+    {
+        return $this->job;
+    }
+
+    public function setJob(string $job): static
+    {
+        $this->job = $job;
 
         return $this;
     }
@@ -78,7 +189,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->pictograms;
     }
 
-    public function addPictogram(Pictogram $pictogram): self
+    public function addPictogram(Pictogram $pictogram): static
     {
         if (!$this->pictograms->contains($pictogram)) {
             $this->pictograms->add($pictogram);
@@ -88,7 +199,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removePictogram(Pictogram $pictogram): self
+    public function removePictogram(Pictogram $pictogram): static
     {
         if ($this->pictograms->removeElement($pictogram)) {
             // set the owning side to null (unless already changed)
@@ -108,7 +219,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->categories;
     }
 
-    public function addCategory(Category $category): self
+    public function addCategory(Category $category): static
     {
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
@@ -118,7 +229,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeCategory(Category $category): self
+    public function removeCategory(Category $category): static
     {
         if ($this->categories->removeElement($category)) {
             // set the owning side to null (unless already changed)
@@ -138,7 +249,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->subCategories;
     }
 
-    public function addSubCategory(SubCategory $subCategory): self
+    public function addSubCategory(SubCategory $subCategory): static
     {
         if (!$this->subCategories->contains($subCategory)) {
             $this->subCategories->add($subCategory);
@@ -148,7 +259,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeSubCategory(SubCategory $subCategory): self
+    public function removeSubCategory(SubCategory $subCategory): static
     {
         if ($this->subCategories->removeElement($subCategory)) {
             // set the owning side to null (unless already changed)
@@ -156,78 +267,6 @@ class Therapist implements PasswordAuthenticatedUserInterface
                 $subCategory->setTherapist(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getFirstName(): ?string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): self
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
-    public function getLastName(): ?string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): self
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function getJob(): ?string
-    {
-        return $this->job;
-    }
-
-    public function setJob(string $job): self
-    {
-        $this->job = $job;
-
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
 
         return $this;
     }
@@ -240,7 +279,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->notes;
     }
 
-    public function addNote(Note $note): self
+    public function addNote(Note $note): static
     {
         if (!$this->notes->contains($note)) {
             $this->notes->add($note);
@@ -250,7 +289,7 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeNote(Note $note): self
+    public function removeNote(Note $note): static
     {
         if ($this->notes->removeElement($note)) {
             // set the owning side to null (unless already changed)
@@ -267,9 +306,21 @@ class Therapist implements PasswordAuthenticatedUserInterface
         return $this->institution;
     }
 
-    public function setInstitution(?Institution $institution): self
+    public function setInstitution(?Institution $institution): static
     {
         $this->institution = $institution;
+
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
 
         return $this;
     }

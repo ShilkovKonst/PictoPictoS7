@@ -14,6 +14,7 @@
     {% endblock %}
   </head>
   <body>
+    {% include "_partials/_flash.html.twig" %}
     {% block body %}
         {% block phrase %} {# Champs Phrase #} 
             {% if patient is defined %}

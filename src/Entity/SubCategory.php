@@ -42,11 +42,11 @@ class SubCategory
     #[Groups(['pictogram', 'subcategory'])]
     private ?Category $category;
 
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'subcategory_id')]
+    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'subCategory')]
     private Collection $pictograms;
 
     #[ORM\ManyToOne(inversedBy: 'subCategories')]
-    private ?Therapist $therapist;
+    private ?Therapist $therapist = null;
 
     public function __construct()
     {
@@ -160,7 +160,7 @@ class SubCategory
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist):self
+    public function setTherapist(?Therapist $therapist): static
     {
         $this->therapist = $therapist;
 

@@ -31,7 +31,7 @@ class AppFixtures extends Fixture
     private TherapistRepository $thRepo;
     private CategoryRepository $cRepo;
     private SubCategoryRepository $scRepo;
-    private PatientRepository $pRepo;
+    private PatientRepository $patRepo;
     private PictogramRepository $pictRepo;
 
     public function __construct(
@@ -40,7 +40,7 @@ class AppFixtures extends Fixture
         TherapistRepository $thRepo,
         CategoryRepository $cRepo,
         SubCategoryRepository $scRepo,
-        PatientRepository $pRepo,
+        PatientRepository $patRepo,
         PictogramRepository $pictRepo
     ) {
         $this->hasher = $hasher;
@@ -49,7 +49,7 @@ class AppFixtures extends Fixture
         $this->thRepo = $thRepo;
         $this->cRepo = $cRepo;
         $this->scRepo = $scRepo;
-        $this->pRepo = $pRepo;
+        $this->patRepo = $patRepo;
         $this->pictRepo = $pictRepo;
     }
 
@@ -1349,37 +1349,37 @@ class AppFixtures extends Fixture
             /* ********** Setting patients ************ */
             switch ($row[1]) {
                 case 1:
-                    $note->setPatient($this->pRepo->findOneByName("Cyril", "Acacio"));
+                    $note->setPatient($this->patRepo->findOneByName("Cyril", "Acacio"));
                     break;
                 case 2:
-                    $note->setPatient($this->pRepo->findOneByName("Simba", "Rudrauf"));
+                    $note->setPatient($this->patRepo->findOneByName("Simba", "Rudrauf"));
                     break;
                 case 14:
-                    $note->setPatient($this->pRepo->findOneByName('Ziggy', 'V'));
+                    $note->setPatient($this->patRepo->findOneByName('Ziggy', 'V'));
                     break;
                 case 15:
-                    $note->setPatient($this->pRepo->findOneByName('John', 'Doe'));
+                    $note->setPatient($this->patRepo->findOneByName('John', 'Doe'));
                     break;
                 case 16:
-                    $note->setPatient($this->pRepo->findOneByName('Tristan', 'Rudrauf'));
+                    $note->setPatient($this->patRepo->findOneByName('Tristan', 'Rudrauf'));
                     break;
                 case 17:
-                    $note->setPatient($this->pRepo->findOneByName('Emilie', 'Ekon'));
+                    $note->setPatient($this->patRepo->findOneByName('Emilie', 'Ekon'));
                     break;
                 case 19:
-                    $note->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
+                    $note->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
                     break;
                 case 20:
-                    $note->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
+                    $note->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
                     break;
                 case 21:
-                    $note->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
+                    $note->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
                     break;
                 case 22:
-                    $note->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
+                    $note->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
                     break;
                 case 23:
-                    $note->setPatient($this->pRepo->findOneByName('sa', 'sa'));
+                    $note->setPatient($this->patRepo->findOneByName('sa', 'sa'));
                     break;
                 default:
                     break;
@@ -1450,37 +1450,37 @@ class AppFixtures extends Fixture
             /* ********** Setting patients ************ */
             switch ($row[3]) {
                 case 1:
-                    $sentence->setPatient($this->pRepo->findOneByName("Cyril", "Acacio"));
+                    $sentence->setPatient($this->patRepo->findOneByName("Cyril", "Acacio"));
                     break;
                 case 2:
-                    $sentence->setPatient($this->pRepo->findOneByName("Simba", "Rudrauf"));
+                    $sentence->setPatient($this->patRepo->findOneByName("Simba", "Rudrauf"));
                     break;
                 case 14:
-                    $sentence->setPatient($this->pRepo->findOneByName('Ziggy', 'V'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Ziggy', 'V'));
                     break;
                 case 15:
-                    $sentence->setPatient($this->pRepo->findOneByName('John', 'Doe'));
+                    $sentence->setPatient($this->patRepo->findOneByName('John', 'Doe'));
                     break;
                 case 16:
-                    $sentence->setPatient($this->pRepo->findOneByName('Tristan', 'Rudrauf'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Tristan', 'Rudrauf'));
                     break;
                 case 17:
-                    $sentence->setPatient($this->pRepo->findOneByName('Emilie', 'Ekon'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Emilie', 'Ekon'));
                     break;
                 case 19:
-                    $sentence->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
                     break;
                 case 20:
-                    $sentence->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
                     break;
                 case 21:
-                    $sentence->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
                     break;
                 case 22:
-                    $sentence->setPatient($this->pRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
+                    $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
                     break;
                 case 23:
-                    $sentence->setPatient($this->pRepo->findOneByName('sa', 'sa'));
+                    $sentence->setPatient($this->patRepo->findOneByName('sa', 'sa'));
                     break;
                 default:
                     break;

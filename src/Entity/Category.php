@@ -41,15 +41,14 @@ class Category
     #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
     private Collection $pictograms;
 
-    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category', orphanRemoval: true)]
     private Collection $subCategories;
-
-    #[ORM\ManyToOne(inversedBy: 'categories')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Therapist $therapist;
 
     #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'category')]
     private Collection $questions;
+
+    #[ORM\ManyToOne(inversedBy: 'categories')]
+    private ?Therapist $therapist = null;
 
     public function __construct()
     {
@@ -181,18 +180,6 @@ class Category
         return $this;
     }
 
-    public function getTherapist(): ?Therapist
-    {
-        return $this->therapist;
-    }
-
-    public function setTherapist(?Therapist $therapist):self
-    {
-        $this->therapist = $therapist;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Question>
      */
@@ -216,6 +203,18 @@ class Category
         if ($this->questions->removeElement($question)) {
             $question->removeCategory($this);
         }
+
+        return $this;
+    }
+
+    public function getTherapist(): ?Therapist
+    {
+        return $this->therapist;
+    }
+
+    public function setTherapist(?Therapist $therapist): static
+    {
+        $this->therapist = $therapist;
 
         return $this;
     }

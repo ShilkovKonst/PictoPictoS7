@@ -1,0 +1,40 @@
+<div class="flex justify-between items-center flex-col w-full h-full p-4 md:p-8 lg:p-12" id="switch-c1">
+  <img src="{{ asset('img/LogoEcam.png') }}" alt="LogoEcam.png" width="140px" class="z-10 ">
+  <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-loose text-[#181818] md:mb-4">Connexion</h2>
+  {% if app.user %}
+  <div class="z-10 mb-3 text-center">
+    Vous êtes vous connecté(e) en tant que 
+    <p class="font-semibold">{{ app.user.userIdentifier }}</p>
+    <form action="{{ path('app_logout') }}" method="get">
+      <button class="z-10 btn-login" type="submit">Déconnecter</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <form class="flex flex-col md:gap-3 justify-between items-center w-full h-full" action="{{ path('app_login') }}" method="post">
+    {% if error %}
+    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData,
+      'security') }}</div>
+    {% endif %}
+
+    {% if app.user == null %}
+    <input type="email" value="{{ last_username }}" name="_username" id="username" class="input-text"
+      autocomplete="email" placeholder="Email" required autofocus>
+    <input type="password" name="_password" id="password" class="input-text" autocomplete="current-password" required
+      placeholder="Mot de passe">
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    <a {# href="{{ path('app_forgot_password_request') }}" #}
+      class="z-10 cursor-pointer underline text-sm leading-loose font-bold hover:text-pred transition duration-150">Mot
+      de passe oublié ?</a>
+    <button class="z-10 btn-login" type="submit">
+      Se connecter
+    </button>
+  </form>
+  {% endif %}
+  <p class="z-10 absolute bottom-3 text-sm mx-auto h-11 leading-loose font-bold">Pas
+    encore de compte ?
+    <a href="{{ path('app_register') }}"
+      class="cursor-pointer underline hover:text-pred transition duration-150">S'inscrire</a>
+  </p>
+</div>

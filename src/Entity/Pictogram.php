@@ -39,15 +39,15 @@ class Pictogram
     private ?\DateTimeInterface $updatedAt;
 
     #[ORM\ManyToOne(inversedBy: 'pictograms')]
+    private ?Therapist $therapist = null;
+
+    #[ORM\ManyToOne(inversedBy: 'pictograms')]
     #[Groups(['pictogram'])]
     private ?Category $category;
 
     #[ORM\ManyToOne(inversedBy: 'pictograms')]
     #[ORM\JoinColumn(nullable: true)]
     private ?SubCategory $subCategory;
-
-    #[ORM\ManyToOne(inversedBy: 'pictograms')]
-    private ?Therapist $therapist;
 
     #[ORM\ManyToMany(targetEntity: Sentence::class, mappedBy: 'pictograms')]
     private Collection $sentences;
@@ -528,18 +528,6 @@ class Pictogram
         return $this;
     }
 
-    public function getTherapist(): ?Therapist
-    {
-        return $this->therapist;
-    }
-
-    public function setTherapist(?Therapist $therapist):self
-    {
-        $this->therapist = $therapist;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Sentence>
      */
@@ -563,6 +551,18 @@ class Pictogram
         if ($this->sentences->removeElement($sentence)) {
             $sentence->removePictogram($this);
         }
+
+        return $this;
+    }
+
+    public function getTherapist(): ?Therapist
+    {
+        return $this->therapist;
+    }
+
+    public function setTherapist(?Therapist $therapist): static
+    {
+        $this->therapist = $therapist;
 
         return $this;
     }

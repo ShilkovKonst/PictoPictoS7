@@ -26,7 +26,7 @@ class Institution
 
     #[ORM\OneToMany(targetEntity: Therapist::class, mappedBy: 'institution')]
     private Collection $therapists;
-
+    
     public function __construct()
     {
         $this->therapists = new ArrayCollection();
@@ -88,7 +88,7 @@ class Institution
         return $this->therapists;
     }
 
-    public function addTherapists(Therapist $therapist):self
+    public function addTherapist(Therapist $therapist): static
     {
         if (!$this->therapists->contains($therapist)) {
             $this->therapists->add($therapist);
@@ -98,7 +98,7 @@ class Institution
         return $this;
     }
 
-    public function removeTherapist(Therapist $therapist):self
+    public function removeTherapist(Therapist $therapist): static
     {
         if ($this->therapists->removeElement($therapist)) {
             // set the owning side to null (unless already changed)

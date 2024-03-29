@@ -22,11 +22,11 @@ class Note
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Therapist $therapist;
+    private ?Patient $patient;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Patient $patient;
+    private ?Therapist $therapist = null;
 
     public function getId(): ?int
     {
@@ -64,18 +64,6 @@ class Note
         return $this;
     }
 
-    public function getTherapist(): ?Therapist
-    {
-        return $this->therapist;
-    }
-
-    public function setTherapist(?Therapist $therapist): self
-    {
-        $this->therapist = $therapist;
-
-        return $this;
-    }
-
     public function getPatient(): ?Patient
     {
         return $this->patient;
@@ -84,6 +72,18 @@ class Note
     public function setPatient(?Patient $patient): self
     {
         $this->patient = $patient;
+
+        return $this;
+    }
+
+    public function getTherapist(): ?Therapist
+    {
+        return $this->therapist;
+    }
+
+    public function setTherapist(?Therapist $therapist): static
+    {
+        $this->therapist = $therapist;
 
         return $this;
     }

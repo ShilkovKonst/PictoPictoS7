@@ -11,8 +11,13 @@ class MainController extends AbstractController
     #[Route('/', name: 'main_index')]
     public function index(): Response
     {
-        return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
-        ]);
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->render('admin/index.html.twig');
+        } else {
+            return $this->redirectToRoute('app_login');
+        }
+        // return $this->render('main/index.html.twig', [
+        //     'controller_name' => 'MainController',
+        // ]);
     }
 }
