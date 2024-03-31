@@ -7,9 +7,12 @@ use App\Form\RegistrationFormType;
 use App\Repository\InstitutionRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -20,8 +23,11 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier, private InstitutionRepository $iRepo)
-    {
+    public function __construct(
+        private EmailVerifier $emailVerifier,
+        private InstitutionRepository $iRepo,
+        private LoggerInterface $logger,
+    ) {
     }
 
     #[Route('/inscription', name: 'app_register')]
@@ -31,12 +37,17 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
+        // creating new error if written institution code doesnt match with the code of the chosen institution 
+        if ($form->isSubmitted() && $form->get('codeInstitution')->getData() != $form->get('institution')->getData()->getCode()) {
+            $form->get('codeInstitution')->addError(new FormError('Le champ du code de l\'Institut doit correspondre au code de l\'Institut choisi'));
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setFirstName($form->get('firstName')->getData());
             $user->setLastName($form->get('lastName')->getData());
             $user->setEmail($form->get('email')->getData());
             $user->setJob($form->get('job')->getData());
-            
+
             $user->setInstitution($this->iRepo->findOneByCode($form->get('codeInstitution')->getData()));
 
             // encode the plain password
@@ -51,7 +62,9 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email',
+                $user,
                 (new TemplatedEmail())
                     ->from(new Address('konst.shilkov@gmail.com', 'PictoPicto'))
                     ->to($user->getEmail())
@@ -62,6 +75,12 @@ class RegistrationController extends AbstractController
             // do anything else you need here, like send an email
 
             return $security->login($user, 'form_login', 'main');
+        } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
+            $errors = $form->getErrors(true);
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            $this->addFlash('danger', implode('<br>', $errorMessages));
         }
 
         return $this->render('registration/register.html.twig', [
