@@ -1,0 +1,75 @@
+<ul
+  class="flex flex-row justify-between items-center w-full md:w-auto md:block my-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059] md:space-y-4 text-left text-gray-500">
+  <li>
+    <a class="group flex items-center space-x-3 rtl:space-x-reverse {{ app.request.getPathInfo == path('admin_index') ? 'text-black font-medium' : 'hover:text-black' }}" href="{{ path('admin_index') }}">
+      <svg
+        class="w-6 h-6 {{ app.request.getPathInfo == path('admin_index') ? 'text-pred' : 'text-pbg group-hover:text-pred' }}"
+        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+        viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+          d="M11.293 3.293a1 1 0 0 1 1.414 0l6 6 2 2a1 1 0 0 1-1.414 1.414L19 12.414V19a2 2 0 0 1-2 2h-3a1 1 0 0 1-1-1v-3h-2v3a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2v-6.586l-.293.293a1 1 0 0 1-1.414-1.414l2-2 6-6Z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="hidden md:block">Accueil</span>
+    </a>
+  </li>
+  <li>
+    <a class="group hover:text-black transition duration-150 ease-in-out flex items-center space-x-3 rtl:space-x-reverse" href="{{ path('admin_index') }}">
+      <svg class="w-6 h-6 text-pbg group-hover:text-pred transition duration-150 ease-in-out " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 9h3m-3 3h3m-3 3h3m-6 1c-.306-.613-.933-1-1.618-1H7.618c-.685 0-1.312.387-1.618 1M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+      </svg>
+      <span class="hidden md:block">Therapists</span>
+    </a>
+  </li>
+  <li>
+    <a class="flex items-center space-x-3 rtl:space-x-reverse" href="{{ path('admin_index') }}">
+      <svg class="w-6 h-6 text-pbg dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+          d="M7 2a2 2 0 0 0-2 2v1a1 1 0 0 0 0 2v1a1 1 0 0 0 0 2v1a1 1 0 1 0 0 2v1a1 1 0 1 0 0 2v1a1 1 0 1 0 0 2v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H7Zm3 8a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm-1 7a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3 1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1Z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="hidden md:block">Patients</span>
+    </a>
+  </li>
+  <li>
+    <a class="flex items-center space-x-3 rtl:space-x-reverse" href="{{ path('admin_index') }}">
+      <svg class="w-6 h-6 text-pbg dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+          d="M6 5a2 2 0 0 1 2-2h4.157a2 2 0 0 1 1.656.879L15.249 6H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2v-5a3 3 0 0 0-3-3h-3.22l-1.14-1.682A3 3 0 0 0 9.157 6H6V5Z"
+          clip-rule="evenodd" />
+        <path fill-rule="evenodd"
+          d="M3 9a2 2 0 0 1 2-2h4.157a2 2 0 0 1 1.656.879L12.249 10H3V9Zm0 3v7a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-7H3Z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="hidden md:block">Categories</span>
+    </a>
+  </li>
+  <li>
+    <a class="flex items-center space-x-3 rtl:space-x-reverse" href="{{ path('admin_index') }}">
+      <svg class="w-6 h-6 text-pbg dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z" clip-rule="evenodd" />
+        <path fill-rule="evenodd"
+          d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12c0 .556-.227 1.06-.593 1.422A.999.999 0 0 1 20.5 20H4a2.002 2.002 0 0 1-2-2V6Zm6.892 12 3.833-5.356-3.99-4.322a1 1 0 0 0-1.549.097L4 12.879V6h16v9.95l-3.257-3.619a1 1 0 0 0-1.557.088L11.2 18H8.892Z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="hidden md:block">Pictograms</span>
+    </a>
+  </li>
+  <li>
+    <a class="flex items-center space-x-3 rtl:space-x-reverse" href="{{ path('admin_index') }}">
+      <svg class="w-6 h-6 text-pbg dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+        height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+          d="M4 4a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2v14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2V5a1 1 0 0 1-1-1Zm5 2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H9Zm5 0a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-1Zm-5 4a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H9Zm5 0a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1h-1Zm-3 4a2 2 0 0 0-2 2v3h2v-3h2v3h2v-3a2 2 0 0 0-2-2h-2Z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="hidden md:block">Instituts</span>
+    </a>
+
+  </li>
+</ul>

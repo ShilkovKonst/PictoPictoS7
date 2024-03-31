@@ -3,18 +3,21 @@
 {% block title %}Hello AdminController!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="sm:h-screen sm:flex sm:justify-center sm:items-center bg-pbg ">
+  <div {#
+    class="relative flex flex-col justify-between items-center w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2 h-full sm:h-5/6 md:h-2/3 bg-pform sm:rounded-xl overflow-hidden p-3">
+    #}
+    class="relative w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2 h-full sm:h-5/6 md:h-2/3 bg-pform sm:rounded-xl
+    overflow-hidden p-3">
+    <!-- titre de l'item choisi -->
+    {% include "admin/index_header.html.twig" %}
+    <div
+      class="flex flex-col md:flex-row items-start p-4 ">
+      {% include "admin/index_content_list.html.twig" %}
+      {% include "admin/index_content_section.html.twig" %}
+    </div>
+  </div>
 
-<div class="example-wrapper text-red-700">
-    <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/STAGE/PictoPictoS7/src/Controller/Admin/AdminController.php</code></li>
-        <li>Your template at <code>D:/STAGE/PictoPictoS7/templates/admin/admin/index.html.twig</code></li>
-    </ul>
 </div>
 {% endblock %}

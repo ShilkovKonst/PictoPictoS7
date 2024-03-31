@@ -1,0 +1,33 @@
+<div class="w-full my-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
+    <table class="table mx-auto">
+        <tbody class="row">
+            <tr class="col-12 col-md-6">
+                <th>Nom</th>
+                <td class="text-end">{{ app.user.lastName}}</td>
+            </tr>
+            <tr class="col-12 col-md-6">
+                <th>Prénom</th>
+                <td class="text-end">{{ app.user.firstName}}</td>
+            </tr>
+            <tr class="col-12 col-md-6">
+                <th>Fonction</th>
+                <td class="text-end">{{ app.user.job }}</td>
+            </tr>
+            <tr class="col-12 col-md-6">
+                <th>Institution</th>
+                <td class="text-end">{{ app.user.institution.name }}</td>
+            </tr>
+            <tr class="col-12">
+                <th>Email</th>
+                <td class="text-end">{{ app.user.email }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-end mt-5">
+        <a {# href="{{ path('admin_edit') }}" #} href="" class="btn btn-sm d-none d-md-inline">Modifier mon
+            profil</a>
+        <a {# href="{{ path('delete_user_form') }}" #} href="" class="btn btn-sm d-none d-md-inline">Supprimer
+            mon
+            profil</a>
+    </div>
+</div>

@@ -14,10 +14,12 @@ module.exports = {
         "pblue": "#ace4e7",
         "pred": "#e58463",
         "pbg": "#1e646f",
+        "pform": "#e5e9ec"
       },
       boxShadow: {
         "inset-2/4": "inset 2px 2px 4px #d1d9e6, inset -2px -2px 4px #f9f9f9",
         "inset-4/4": "inset 4px 4px 4px #d1d9e6, inset -4px -4px 4px #f9f9f9",
+        "inset-5/5": "inset 5px 5px 5px #dedfe040, inset -5px -5px 5px #ffffff",
         "inset-8/12": "inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9",
         "outset-6/10": "6px 6px 10px #d1d9e6, -6px -6px 10px #f9f9f9",
         "outset-2/6": "2px 2px 6px #d1d9e6, -2px -2px 6px #f9f9f9",

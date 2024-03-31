@@ -6,7 +6,9 @@
 
 body {
   min-width: 360px;
-  background-color: skyblue;
+}
+form div div ul {
+  display: none;
 }
 
 @layer components {
