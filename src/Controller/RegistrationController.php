@@ -71,9 +71,8 @@ class RegistrationController extends AbstractController
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
-
-            // do anything else you need here, like send an email
-
+            $this->addFlash('warning', 'Un email avec les instructions de confirmation a été envoyé à votre adresse email. Veuillez vérifier votre boîte de réception.');
+            
             return $security->login($user, 'form_login', 'main');
         } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
             $errors = $form->getErrors(true);
@@ -103,7 +102,35 @@ class RegistrationController extends AbstractController
         }
 
         // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
+        $this->addFlash('success', 'Votre adresse email a été vérifiée.');
+
+        return $this->redirectToRoute('admin_index');
+    }
+    
+    #[Route('/verify/email/resend', name: 'app_verify_email_resend')]
+    public function resendVerifyUserEmail(Request $request, TranslatorInterface $translator): Response
+    {
+        /** @var Therapist $user */
+        $user=$this->getUser();
+        if (!$user) {
+            $this->addFlash('danger', "Vous devez être connecté pour accéder à cette page!");
+            return $this->redirectToRoute('app_login');
+        }        
+        if ($user->isVerified()) {
+            $this->addFlash('warning', "Votre compte est déjà activé.");
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $this->emailVerifier->sendEmailConfirmation(
+            'app_verify_email',
+            $user,
+            (new TemplatedEmail())
+                ->from(new Address('konst.shilkov@gmail.com', 'PictoPicto'))
+                ->to($user->getEmail())
+                ->subject('Please Confirm your Email')
+                ->htmlTemplate('registration/confirmation_email.html.twig')
+        );
+        $this->addFlash('warning', 'Un email avec les instructions de confirmation a été envoyé à votre adresse email. Veuillez vérifier votre boîte de réception.');
 
         return $this->redirectToRoute('admin_index');
     }
