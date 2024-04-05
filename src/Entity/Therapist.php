@@ -44,15 +44,6 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $job = null;
 
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
-    private Collection $pictograms;
-
-    #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'therapist')]
-    private Collection $categories;
-
-    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'therapist')]
-    private Collection $subCategories;
-
     #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'therapist')]
     private Collection $notes;
 
@@ -62,12 +53,17 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
 
+    #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'therapist')]
+    private Collection $categories;
+
+    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
+    private Collection $pictograms;
+
     public function __construct()
     {
-        $this->pictograms = new ArrayCollection();
-        $this->categories = new ArrayCollection();
-        $this->subCategories = new ArrayCollection();
         $this->notes = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->pictograms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,96 +178,6 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Pictogram>
-     */
-    public function getPictograms(): Collection
-    {
-        return $this->pictograms;
-    }
-
-    public function addPictogram(Pictogram $pictogram): static
-    {
-        if (!$this->pictograms->contains($pictogram)) {
-            $this->pictograms->add($pictogram);
-            $pictogram->setTherapist($this);
-        }
-
-        return $this;
-    }
-
-    public function removePictogram(Pictogram $pictogram): static
-    {
-        if ($this->pictograms->removeElement($pictogram)) {
-            // set the owning side to null (unless already changed)
-            if ($pictogram->getTherapist() === $this) {
-                $pictogram->setTherapist(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getCategories(): Collection
-    {
-        return $this->categories;
-    }
-
-    public function addCategory(Category $category): static
-    {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->setTherapist($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Category $category): static
-    {
-        if ($this->categories->removeElement($category)) {
-            // set the owning side to null (unless already changed)
-            if ($category->getTherapist() === $this) {
-                $category->setTherapist(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SubCategory>
-     */
-    public function getSubCategories(): Collection
-    {
-        return $this->subCategories;
-    }
-
-    public function addSubCategory(SubCategory $subCategory): static
-    {
-        if (!$this->subCategories->contains($subCategory)) {
-            $this->subCategories->add($subCategory);
-            $subCategory->setTherapist($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubCategory(SubCategory $subCategory): static
-    {
-        if ($this->subCategories->removeElement($subCategory)) {
-            // set the owning side to null (unless already changed)
-            if ($subCategory->getTherapist() === $this) {
-                $subCategory->setTherapist(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Note>
      */
     public function getNotes(): Collection
@@ -321,6 +227,66 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setTherapist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getTherapist() === $this) {
+                $category->setTherapist(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pictogram>
+     */
+    public function getPictograms(): Collection
+    {
+        return $this->pictograms;
+    }
+
+    public function addPictogram(Pictogram $pictogram): static
+    {
+        if (!$this->pictograms->contains($pictogram)) {
+            $this->pictograms->add($pictogram);
+            $pictogram->setTherapist($this);
+        }
+
+        return $this;
+    }
+
+    public function removePictogram(Pictogram $pictogram): static
+    {
+        if ($this->pictograms->removeElement($pictogram)) {
+            // set the owning side to null (unless already changed)
+            if ($pictogram->getTherapist() === $this) {
+                $pictogram->setTherapist(null);
+            }
+        }
 
         return $this;
     }

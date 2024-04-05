@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240327032705 extends AbstractMigration
+final class Version20240405202346 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,14 @@ final class Version20240327032705 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE pictogram CHANGE sub_category_id sub_category_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE category DROP FOREIGN KEY FK_64C19C1B85A1111');
+        $this->addSql('ALTER TABLE category ADD CONSTRAINT FK_64C19C1B85A1111 FOREIGN KEY (super_category_id) REFERENCES category (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE pictogram CHANGE sub_category_id sub_category_id INT NOT NULL');
+        $this->addSql('ALTER TABLE category DROP FOREIGN KEY FK_64C19C1B85A1111');
+        $this->addSql('ALTER TABLE category ADD CONSTRAINT FK_64C19C1B85A1111 FOREIGN KEY (super_category_id) REFERENCES category (id) ON UPDATE NO ACTION ON DELETE NO ACTION');
     }
 }

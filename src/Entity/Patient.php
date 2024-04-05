@@ -37,6 +37,9 @@ class Patient
     #[ORM\OneToMany(targetEntity: Sentence::class, mappedBy: 'patient')]
     private Collection $sentences;
 
+    #[ORM\Column(length: 255)]
+    private ?string $sex = null;
+
     public function __construct()
     {
         $this->notes = new ArrayCollection();
@@ -171,6 +174,18 @@ class Patient
                 $sentence->setPatient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSex(): ?string
+    {
+        return $this->sex;
+    }
+
+    public function setSex(string $sex): static
+    {
+        $this->sex = $sex;
 
         return $this;
     }

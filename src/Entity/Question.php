@@ -18,12 +18,16 @@ class Question
     #[ORM\Column(length: 255)]
     private ?string $text;
 
+    // #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'questions')]
+    // private Collection $category;
+
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'questions')]
-    private Collection $category;
+    private Collection $categories;
 
     public function __construct()
     {
-        $this->category = new ArrayCollection();
+        // $this->category = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -50,18 +54,42 @@ class Question
         return $this;
     }
 
+    // /**
+    //  * @return Collection<int, Category>
+    //  */
+    // public function getCategory(): Collection
+    // {
+    //     return $this->category;
+    // }
+
+    // public function addCategory(Category $category): self
+    // {
+    //     if (!$this->category->contains($category)) {
+    //         $this->category->add($category);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeCategory(Category $category): self
+    // {
+    //     $this->category->removeElement($category);
+
+    //     return $this;
+    // }
+
     /**
      * @return Collection<int, Category>
      */
-    public function getCategory(): Collection
+    public function getCategories(): Collection
     {
-        return $this->category;
+        return $this->categories;
     }
 
     public function addCategory(Category $category): self
     {
-        if (!$this->category->contains($category)) {
-            $this->category->add($category);
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
         }
 
         return $this;
@@ -69,7 +97,7 @@ class Question
 
     public function removeCategory(Category $category): self
     {
-        $this->category->removeElement($category);
+        $this->categories->removeElement($category);
 
         return $this;
     }

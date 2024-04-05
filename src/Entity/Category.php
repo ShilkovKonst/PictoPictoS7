@@ -2,59 +2,47 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\IllustrationFilenameTrait;
+use App\Entity\Trait\NameTrait;
+use App\Entity\Trait\UpdatedAtTrait;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[Vich\Uploadable()]
 class Category
 {
+    use NameTrait;
+    use IllustrationFilenameTrait;
+    use UpdatedAtTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['category', 'pictogram', 'subcategory'])]
-    private ?int $id;
+    private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['category', 'pictogram', 'subcategory'])]
-    private ?string $name;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subCategories')]
+    #[ORM\JoinColumn(onDelete: 'cascade')]
+    private ?self $superCategory = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['category', 'pictogram', 'subcategory'])]
-    private ?string $filename;
-
-    #[Assert\Image(mimeTypes: ["image/png"])]
-    #[Vich\UploadableField(mapping: "category_image", fileNameProperty: "filename")]
-    private ?File $illustration = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $update_at;
-
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
-    private Collection $pictograms;
-
-    #[ORM\OneToMany(targetEntity: SubCategory::class, mappedBy: 'category', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'superCategory', orphanRemoval: true)]
     private Collection $subCategories;
 
-    #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'category')]
+    #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'categories')]
     private Collection $questions;
 
     #[ORM\ManyToOne(inversedBy: 'categories')]
     private ?Therapist $therapist = null;
 
+    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
+    private Collection $pictograms;
+
     public function __construct()
     {
-        $this->pictograms = new ArrayCollection();
         $this->subCategories = new ArrayCollection();
         $this->questions = new ArrayCollection();
+        $this->pictograms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -62,118 +50,49 @@ class Category
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getSuperCategory(): ?self
     {
-        return $this->name;
+        return $this->superCategory;
     }
 
-    public function setName(string $name): self
+    public function setSuperCategory(?self $superCategory): static
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getFilename(): ?string
-    {
-        return $this->filename;
-    }
-
-    public function setFilename(string $filename): self
-    {
-        $this->filename = $filename;
-
-        return $this;
-    }
-
-    public function getIllustration(): ?File
-    {
-        return $this->illustration;
-    }
-
-    public function setIllustration(File $illustration): self
-    {
-        $this->illustration = $illustration;
-        if ($this->illustration instanceof UploadedFile) {
-            $this->update_at = new \DateTime('now');
-        }
-
-        return $this;
-    }
-
-    public function getUpdateAt(): ?\DateTimeInterface
-    {
-        return $this->update_at;
-    }
-
-    public function setUpdateAt(\DateTimeInterface $update_at): self
-    {
-        $this->update_at = $update_at;
+        $this->superCategory = $superCategory;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Pictogram>
-     */
-    public function getPictograms(): Collection
-    {
-        return $this->pictograms;
-    }
-
-    public function addPictogram(Pictogram $pictogram):self
-    {
-        if (!$this->pictograms->contains($pictogram)) {
-            $this->pictograms->add($pictogram);
-            $pictogram->setCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removePictogram(Pictogram $pictogram):self
-    {
-        if ($this->pictograms->removeElement($pictogram)) {
-            // set the owning side to null (unless already changed)
-            if ($pictogram->getCategory() === $this) {
-                $pictogram->setCategory(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SubCategory>
+     * @return Collection<int, self>
      */
     public function getSubCategories(): Collection
     {
         return $this->subCategories;
     }
 
-    public function addSubCategory(SubCategory $subCategory):self
+    public function addSubCategory(self $subCategory): static
     {
         if (!$this->subCategories->contains($subCategory)) {
             $this->subCategories->add($subCategory);
-            $subCategory->setCategoryId($this);
+            $subCategory->setSuperCategory($this);
         }
 
         return $this;
     }
 
-    public function removeSubCategory(SubCategory $subCategory):self
+    public function removeSubCategory(self $subCategory): static
     {
         if ($this->subCategories->removeElement($subCategory)) {
             // set the owning side to null (unless already changed)
-            if ($subCategory->getCategoryId() === $this) {
-                $subCategory->setCategoryId(null);
+            if ($subCategory->getSuperCategory() === $this) {
+                $subCategory->setSuperCategory(null);
             }
         }
 
@@ -188,21 +107,18 @@ class Category
         return $this->questions;
     }
 
-    public function addQuestion(Question $question):self
+    public function addQuestion(Question $question): static
     {
         if (!$this->questions->contains($question)) {
             $this->questions->add($question);
-            $question->addCategory($this);
         }
 
         return $this;
     }
 
-    public function removeQuestion(Question $question):self
+    public function removeQuestion(Question $question): static
     {
-        if ($this->questions->removeElement($question)) {
-            $question->removeCategory($this);
-        }
+        $this->questions->removeElement($question);
 
         return $this;
     }
@@ -215,6 +131,36 @@ class Category
     public function setTherapist(?Therapist $therapist): static
     {
         $this->therapist = $therapist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pictogram>
+     */
+    public function getPictograms(): Collection
+    {
+        return $this->pictograms;
+    }
+
+    public function addPictogram(Pictogram $pictogram): static
+    {
+        if (!$this->pictograms->contains($pictogram)) {
+            $this->pictograms->add($pictogram);
+            $pictogram->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removePictogram(Pictogram $pictogram): static
+    {
+        if ($this->pictograms->removeElement($pictogram)) {
+            // set the owning side to null (unless already changed)
+            if ($pictogram->getCategory() === $this) {
+                $pictogram->setCategory(null);
+            }
+        }
 
         return $this;
     }
