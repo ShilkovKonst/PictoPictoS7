@@ -1,0 +1,23 @@
+<div
+  class="w-full mt-3 md:mt-0 md:ml-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
+  <table class="table w-full">
+    <tbody class="">
+      {% for category in categories %}
+      <tr>
+        <th class="text-start">
+          <img class="h-10 w-10" src="{{ asset('img/cat/' ~ category.filename) }}" alt="{{ category.filename }}">
+        </th>
+        <th class="text-start">{{ category.name }}</th>
+        <td class="text-start">Updated at: {{ category.updateAt|date("Y-m-d_H:i:s") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="text-end mt-5">
+    <a href="{{ path('admin_profile_edit') }}" class="btn btn-sm d-none d-md-inline">Modifier mon
+      profil</a>
+    <a href="{{ path('admin_profile_delete') }}" class="btn btn-sm d-none d-md-inline">Supprimer
+      mon
+      profil</a>
+  </div>
+</div>

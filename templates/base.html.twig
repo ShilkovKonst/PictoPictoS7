@@ -16,8 +16,9 @@
 </head>
 
 <body>
-    <div class="absolute left-0 top-0 right-0">
-        {% include "_partials/_flash.html.twig" %}</div>
+    <div class="absolute left-0 top-0 right-0 z-50">
+        {% include "_partials/_flash.html.twig" %}
+    </div>
     {% block body %}
     {% block phrase %} {# Champs Phrase #}
     {% if patient is defined %}
