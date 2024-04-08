@@ -3,9 +3,11 @@
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-<div class="sm:h-screen sm:flex sm:justify-center sm:items-center bg-pbg ">
+{# <div class="sm:h-screen sm:flex sm:justify-center sm:items-center bg-pbg "> #}
+<div class="sm:h-screen bg-pbg sm:pt-10">  
   <div
-    class="relative flex flex-col justify-center items-center w-full sm:w-5/6 md:w-4/5 lg:w-3/4 xl:w-2/3 h-full md:h-5/6 bg-pform sm:rounded-xl overflow-hidden">
+    {# class="relative flex flex-col justify-center items-center w-full sm:w-5/6 md:w-4/5 lg:w-3/4 xl:w-2/3 h-full md:h-5/6 bg-pform sm:rounded-xl overflow-hidden"> #}
+    class="relative w-full sm:w-5/6 md:w-4/5 lg:w-3/4 xl:w-2/3 h-full sm:h-5/6 md:h-4/5 bg-pform sm:rounded-xl overflow-hidden p-3 ml-auto mr-auto">
     <div class="switch__circle absolute w-96 h-96 rounded-full -bottom-1/3 -left-1/3 shadow-inset-8/12">
     </div>
     <div class="switch__circle switch__circle--t absolute w-96 h-96 rounded-full -top-1/3 left-3/4 shadow-inset-8/12">
@@ -75,7 +77,7 @@
         {{ form_row(registrationForm.agreeTerms) }}
       </div> #}
 
-      <button type="submit" class="btn-login">S'inscrire</button>
+      <button type="submit" class="btn-b">S'inscrire</button>
       {{ form_end(registrationForm) }}
       <p class="z-10 absolute bottom-3 text-sm mx-auto h-11 leading-loose font-bold">Avez-vous déjà un compte?
         <a href="{{ path('app_login') }}" class="cursor-pointer underline hover:text-pred transition duration-150">Se

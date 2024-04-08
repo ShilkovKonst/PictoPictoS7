@@ -2,17 +2,35 @@
 
 namespace App\Entity;
 
-use App\Repository\PictogramPronomRepository;
+use App\Repository\PictogramPronounRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\AssociationOverride;
+use Doctrine\ORM\Mapping\AssociationOverrides;
+use Doctrine\ORM\Mapping\AttributeOverride;
+use Doctrine\ORM\Mapping\AttributeOverrides;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
 
-#[ORM\Entity(repositoryClass: PictogramPronomRepository::class)]
+#[ORM\Entity(repositoryClass: PictogramPronounRepository::class)]
+#[AttributeOverrides([
+    new AttributeOverride(
+        name: 'id',
+        column: new Column()
+    ),
+])]
+#[AssociationOverrides([
+    new AssociationOverride(
+        name: 'sentences',
+        joinTable: new JoinTable(
+            name: 'pictogram_pronouns_sentences',
+        ),
+        // joinColumns: [new JoinColumn(name: 'pictogramPronouns')],
+        // inverseJoinColumns: [new JoinColumn(name: 'pictogramPronouns')]
+    ),
+])]
 class PictogramPronoun extends Pictogram
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private ?string $person = null;
 
@@ -21,11 +39,6 @@ class PictogramPronoun extends Pictogram
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $genre = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getPerson(): ?string
     {

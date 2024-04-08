@@ -27,6 +27,7 @@ module.exports = {
         "outset-8/16": "8px 8px 16px #d1d9e6, -8px -8px 16px #f9f9f9",
         // tailwind color palette (https://tailwindcss.com/docs/customizing-colors#customizing), 200 and 400 strong colors
         "danger-inset-2/4": "inset 2px 2px 4px #f87171, inset -2px -2px 4px #fecaca",
+        "warning-inset-2/4": "inset 2px 2px 4px #facc15, inset -2px -2px 4px #fef08a",
         "success-inset-2/4": "inset 2px 2px 4px #4ade80, inset -2px -2px 4px #bbf7d0"
       }
     },

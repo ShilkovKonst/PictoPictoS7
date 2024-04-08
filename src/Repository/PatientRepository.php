@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Patient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -35,6 +36,40 @@ class PatientRepository extends ServiceEntityRepository
     //            ->getResult()
     //        ;
     //    }
+
+    /**
+     * @return Category[] Returns an array of Category objects
+     */
+    public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir): Paginator
+    {
+        return new Paginator(
+            $this->createQueryBuilder('p')
+                ->orderBy('p.' . $sortBy, $sortDir)
+                ->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+            false
+        );
+    }
+
+    /**
+     * @return Category[] Returns an array of Category objects
+     */
+    public function findbyTherapistWithPaginator(int $therapistId, int $limit, int $page, string $sortBy, string $sortDir): Paginator
+    {
+        return new Paginator(
+            $this->createQueryBuilder('p')
+            ->andWhere('p.therapist = :therapistId')
+            ->setParameter('therapistId', $therapistId)
+                ->orderBy('p.' . $sortBy, $sortDir)
+                ->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+            false
+        );
+    }
 
     // public function findOneBySomeField($value): ?Patient
     // {

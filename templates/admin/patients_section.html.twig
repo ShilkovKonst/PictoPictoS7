@@ -1,21 +1,21 @@
 <div
-  class="w-full mt-3 md:mt-0 md:ml-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
-  <table class="table w-full">
-    <tbody class="">
+  class="w-full h-4/5 flex flex-col justify-between md:justify-start overflow-auto mt-3 md:mt-0 md:ml-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
+  <table class="table w-full relative">
+    <tbody class="flex flex-col gap-1">
+      <tr class="absolute -top-3 left-0"><td>{{ count }} therapists au total</td></tr>
+      <tr class="flex flex-row justify-start items-center text-sm sm:text-base py-4 border-b">
+        <th class="text-center md:text-start w-1/3">Nom</th>
+        <th class="text-center md:text-start w-1/3">Date de naissance</th>
+        <th class="text-center md:text-start w-1/3">Actions</th>
+      </tr>
       {% for patient in patients %}
-      <tr>
-        <th class="text-start">{{ patient.firstName }} {{patient.lastName}}</th>
-        <td class="text-start">{{ patient.birthDate|date("Y-m-d") }}</td>
-        <td class="text-start">{{ patient.schoolGrade}}</td>
+      <tr class="flex flex-row justify-start items-center text-sm sm:text-base border-b pb-1">
+        <td class="text-center md:text-start w-1/3">{{ patient.firstName }} {{patient.lastName}}</th>
+        <td class="text-center md:text-start w-1/3">{{ patient.birthDate|date("Y-m-d") }}</td>
+        <td class="text-center md:text-start w-1/3"></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <div class="text-end mt-5">
-    <a href="{{ path('admin_profile_edit') }}" class="btn btn-sm d-none d-md-inline">Modifier mon
-      profil</a>
-    <a href="{{ path('admin_profile_delete') }}" class="btn btn-sm d-none d-md-inline">Supprimer
-      mon
-      profil</a>
-  </div>
+  {% include "/admin/_pagination.html.twig" with {path: 'admin_patients'} %}
 </div>

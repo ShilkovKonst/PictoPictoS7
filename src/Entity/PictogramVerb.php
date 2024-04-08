@@ -2,17 +2,35 @@
 
 namespace App\Entity;
 
-use App\Repository\PictogramVerbeRepository;
+use App\Repository\PictogramVerbRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\AssociationOverride;
+use Doctrine\ORM\Mapping\AssociationOverrides;
+use Doctrine\ORM\Mapping\AttributeOverride;
+use Doctrine\ORM\Mapping\AttributeOverrides;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
 
-#[ORM\Entity(repositoryClass: PictogramVerbeRepository::class)]
+#[ORM\Entity(repositoryClass: PictogramVerbRepository::class)]
+#[AttributeOverrides([
+    new AttributeOverride(
+        name: 'id',
+        column: new Column()
+    ),
+])]
+#[AssociationOverrides([
+    new AssociationOverride(
+        name: 'sentences',
+        joinTable: new JoinTable(
+            name: 'pictogram_verbs_sentences',
+        ),
+        // joinColumns: [new JoinColumn(name: 'pictogramVerbs')],
+        // inverseJoinColumns: [new JoinColumn(name: 'pictogramVerbs')]
+    ),
+])]
 class PictogramVerb extends Pictogram
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private ?string $singPremPresent = null;
 
@@ -66,11 +84,6 @@ class PictogramVerb extends Pictogram
 
     #[ORM\Column(length: 255)]
     private ?string $plurTroisPasse = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getSingPremPresent(): ?string
     {

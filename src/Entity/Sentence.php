@@ -30,15 +30,11 @@ class Sentence
     #[ORM\JoinColumn(nullable: false)]
     private ?Patient $patient;
 
-    // #[ORM\ManyToMany(targetEntity: Pictogram::class, inversedBy: 'sentences')]
-    // private Collection $pictograms;
-
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'sentences')]
+    #[ORM\ManyToMany(targetEntity: Pictogram::class, mappedBy: 'sentences')]
     private Collection $pictograms;
 
     public function __construct()
     {
-        // $this->pictograms = new ArrayCollection();
         $this->pictograms = new ArrayCollection();
     }
 
@@ -108,30 +104,6 @@ class Sentence
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Pictogram>
-    //  */
-    // public function getPictograms(): Collection
-    // {
-    //     return $this->pictograms;
-    // }
-
-    // public function addPictogram(Pictogram $pictogram): self
-    // {
-    //     if (!$this->pictograms->contains($pictogram)) {
-    //         $this->pictograms->add($pictogram);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removePictogram(Pictogram $pictogram): self
-    // {
-    //     $this->pictograms->removeElement($pictogram);
-
-    //     return $this;
-    // }
-
     /**
      * @return Collection<int, Pictogram>
      */
@@ -144,7 +116,6 @@ class Sentence
     {
         if (!$this->pictograms->contains($pictogram)) {
             $this->pictograms->add($pictogram);
-            $pictogram->setSentences($this);
         }
 
         return $this;
@@ -152,12 +123,7 @@ class Sentence
 
     public function removePictogram(Pictogram $pictogram): static
     {
-        if ($this->pictograms->removeElement($pictogram)) {
-            // set the owning side to null (unless already changed)
-            if ($pictogram->getSentences() === $this) {
-                $pictogram->setSentences(null);
-            }
-        }
+        $this->pictograms->removeElement($pictogram);
 
         return $this;
     }

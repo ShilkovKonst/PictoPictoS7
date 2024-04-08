@@ -56,14 +56,18 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'therapist')]
     private Collection $categories;
 
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
-    private Collection $pictograms;
+    // #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'therapist')]
+    // private Collection $pictograms;
+
+    #[ORM\OneToMany(targetEntity: Patient::class, mappedBy: 'therapist')]
+    private Collection $patients;
 
     public function __construct()
     {
         $this->notes = new ArrayCollection();
         $this->categories = new ArrayCollection();
-        $this->pictograms = new ArrayCollection();
+        // $this->pictograms = new ArrayCollection();
+        $this->patients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -261,30 +265,60 @@ class Therapist implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // /**
+    //  * @return Collection<int, Pictogram>
+    //  */
+    // public function getPictograms(): Collection
+    // {
+    //     return $this->pictograms;
+    // }
+
+    // public function addPictogram(Pictogram $pictogram): static
+    // {
+    //     if (!$this->pictograms->contains($pictogram)) {
+    //         $this->pictograms->add($pictogram);
+    //         $pictogram->setTherapist($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removePictogram(Pictogram $pictogram): static
+    // {
+    //     if ($this->pictograms->removeElement($pictogram)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($pictogram->getTherapist() === $this) {
+    //             $pictogram->setTherapist(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
     /**
-     * @return Collection<int, Pictogram>
+     * @return Collection<int, Patient>
      */
-    public function getPictograms(): Collection
+    public function getPatients(): Collection
     {
-        return $this->pictograms;
+        return $this->patients;
     }
 
-    public function addPictogram(Pictogram $pictogram): static
+    public function addPatient(Patient $patient): static
     {
-        if (!$this->pictograms->contains($pictogram)) {
-            $this->pictograms->add($pictogram);
-            $pictogram->setTherapist($this);
+        if (!$this->patients->contains($patient)) {
+            $this->patients->add($patient);
+            $patient->setTherapist($this);
         }
 
         return $this;
     }
 
-    public function removePictogram(Pictogram $pictogram): static
+    public function removePatient(Patient $patient): static
     {
-        if ($this->pictograms->removeElement($pictogram)) {
+        if ($this->patients->removeElement($patient)) {
             // set the owning side to null (unless already changed)
-            if ($pictogram->getTherapist() === $this) {
-                $pictogram->setTherapist(null);
+            if ($patient->getTherapist() === $this) {
+                $patient->setTherapist(null);
             }
         }
 

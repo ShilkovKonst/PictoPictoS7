@@ -40,6 +40,9 @@ class Patient
     #[ORM\Column(length: 255)]
     private ?string $sex = null;
 
+    #[ORM\ManyToOne(inversedBy: 'patients')]
+    private ?Therapist $therapist = null;
+
     public function __construct()
     {
         $this->notes = new ArrayCollection();
@@ -186,6 +189,18 @@ class Patient
     public function setSex(string $sex): static
     {
         $this->sex = $sex;
+
+        return $this;
+    }
+
+    public function getTherapist(): ?Therapist
+    {
+        return $this->therapist;
+    }
+
+    public function setTherapist(?Therapist $therapist): static
+    {
+        $this->therapist = $therapist;
 
         return $this;
     }

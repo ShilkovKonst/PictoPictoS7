@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\PictogramVerbe;
+use App\Entity\PictogramPronoun;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PictogramVerbe>
+ * @extends ServiceEntityRepository<PictogramPronom>
  *
- * @method PictogramVerbe|null find($id, $lockMode = null, $lockVersion = null)
- * @method PictogramVerbe|null findOneBy(array $criteria, array $orderBy = null)
- * @method PictogramVerbe[]    findAll()
- * @method PictogramVerbe[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method PictogramPronom|null find($id, $lockMode = null, $lockVersion = null)
+ * @method PictogramPronom|null findOneBy(array $criteria, array $orderBy = null)
+ * @method PictogramPronom[]    findAll()
+ * @method PictogramPronom[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PictogramVerbeRepository extends ServiceEntityRepository
+class PictogramPronounRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, PictogramVerbe::class);
+        parent::__construct($registry, PictogramPronoun::class);
     }
 
     //    /**
-    //     * @return PictogramVerbe[] Returns an array of PictogramVerbe objects
+    //     * @return PictogramPronom[] Returns an array of PictogramPronom objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -36,7 +36,7 @@ class PictogramVerbeRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?PictogramVerbe
+    //    public function findOneBySomeField($value): ?PictogramPronom
     //    {
     //        return $this->createQueryBuilder('p')
     //            ->andWhere('p.exampleField = :val')

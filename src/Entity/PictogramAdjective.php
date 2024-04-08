@@ -4,76 +4,87 @@ namespace App\Entity;
 
 use App\Repository\PictogramAdjectiveRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\AssociationOverride;
+use Doctrine\ORM\Mapping\AssociationOverrides;
+use Doctrine\ORM\Mapping\AttributeOverride;
+use Doctrine\ORM\Mapping\AttributeOverrides;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
 
 #[ORM\Entity(repositoryClass: PictogramAdjectiveRepository::class)]
+#[AttributeOverrides([
+    new AttributeOverride(
+        name: 'id',
+        column: new Column()
+    ),
+])]
+#[AssociationOverrides([
+    new AssociationOverride(
+        name: 'sentences',
+        joinTable: new JoinTable(
+            name: 'pictogram_adjectives_sentences',
+        ),
+    ),
+])]
 class PictogramAdjective extends Pictogram
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(length: 255)]
+    private ?string $singMasculin = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $SingMasculin = null;
+    private ?string $singFeminin = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $SingFeminin = null;
+    private ?string $plurMasculin = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $PlurMasculin = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $PlurFeminin = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    private ?string $plurFeminin = null;
 
     public function getSingMasculin(): ?string
     {
-        return $this->SingMasculin;
+        return $this->singMasculin;
     }
 
-    public function setSingMasculin(string $SingMasculin): static
+    public function setSingMasculin(string $singMasculin): static
     {
-        $this->SingMasculin = $SingMasculin;
+        $this->singMasculin = $singMasculin;
 
         return $this;
     }
 
     public function getSingFeminin(): ?string
     {
-        return $this->SingFeminin;
+        return $this->singFeminin;
     }
 
-    public function setSingFeminin(string $SingFeminin): static
+    public function setSingFeminin(string $singFeminin): static
     {
-        $this->SingFeminin = $SingFeminin;
+        $this->singFeminin = $singFeminin;
 
         return $this;
     }
 
     public function getPlurMasculin(): ?string
     {
-        return $this->PlurMasculin;
+        return $this->plurMasculin;
     }
 
-    public function setPlurMasculin(string $PlurMasculin): static
+    public function setPlurMasculin(string $plurMasculin): static
     {
-        $this->PlurMasculin = $PlurMasculin;
+        $this->plurMasculin = $plurMasculin;
 
         return $this;
     }
 
     public function getPlurFeminin(): ?string
     {
-        return $this->PlurFeminin;
+        return $this->plurFeminin;
     }
 
-    public function setPlurFeminin(string $PlurFeminin): static
+    public function setPlurFeminin(string $plurFeminin): static
     {
-        $this->PlurFeminin = $PlurFeminin;
+        $this->plurFeminin = $plurFeminin;
 
         return $this;
     }

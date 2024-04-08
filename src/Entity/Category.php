@@ -35,14 +35,14 @@ class Category
     #[ORM\ManyToOne(inversedBy: 'categories')]
     private ?Therapist $therapist = null;
 
-    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
-    private Collection $pictograms;
+    // #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
+    // private Collection $pictograms;
 
     public function __construct()
     {
         $this->subCategories = new ArrayCollection();
         $this->questions = new ArrayCollection();
-        $this->pictograms = new ArrayCollection();
+        // $this->pictograms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,33 +135,33 @@ class Category
         return $this;
     }
 
-    /**
-     * @return Collection<int, Pictogram>
-     */
-    public function getPictograms(): Collection
-    {
-        return $this->pictograms;
-    }
+    // /**
+    //  * @return Collection<int, Pictogram>
+    //  */
+    // public function getPictograms(): Collection
+    // {
+    //     return $this->pictograms;
+    // }
 
-    public function addPictogram(Pictogram $pictogram): static
-    {
-        if (!$this->pictograms->contains($pictogram)) {
-            $this->pictograms->add($pictogram);
-            $pictogram->setCategory($this);
-        }
+    // public function addPictogram(Pictogram $pictogram): static
+    // {
+    //     if (!$this->pictograms->contains($pictogram)) {
+    //         $this->pictograms->add($pictogram);
+    //         $pictogram->setCategory($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removePictogram(Pictogram $pictogram): static
-    {
-        if ($this->pictograms->removeElement($pictogram)) {
-            // set the owning side to null (unless already changed)
-            if ($pictogram->getCategory() === $this) {
-                $pictogram->setCategory(null);
-            }
-        }
+    // public function removePictogram(Pictogram $pictogram): static
+    // {
+    //     if ($this->pictograms->removeElement($pictogram)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($pictogram->getCategory() === $this) {
+    //             $pictogram->setCategory(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

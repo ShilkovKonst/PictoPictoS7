@@ -1,11 +1,46 @@
 {% for label, messages in app.flashes %}
-	{% for message in messages %}
-		<div class="alert alert-{{ label }} alert-dismissible rounded-0 mb-0" role="alert">
-			{# <button type="button" class="btn btn-close" data-bs-dismiss="alert" aria-label="close"> #}
-			</button>
-			<div class="alert-message">
-				{{ message|raw }}
-			</div>
-		</div>
-	{% endfor %}
+{% for message in messages %}
+{% if label == "danger" %}
+<div class="alert alert-danger rounded-0 mb-0 relative" role="alert">
+	<button type="button" class="absolute top-2 right-2" aria-label="close">
+		<svg class="w-6 h-6 text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+			width="24" height="24" fill="none" viewBox="0 0 24 24">
+			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+				d="M6 18 17.94 6M18 18 6.06 6" />
+		</svg>
+	</button>
+	<div class="alert-message">
+		{{ message|raw }}
+	</div>
+</div>
+{% endif %}
+{% if label == "warning" %}
+<div class="alert alert-warning alert-dismissible rounded-0 mb-0 relative" role="alert">
+	<button type="button" class="absolute top-2 right-2" aria-label="close">
+		<svg class="w-6 h-6 text-yellow-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+			width="24" height="24" fill="none" viewBox="0 0 24 24">
+			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+				d="M6 18 17.94 6M18 18 6.06 6" />
+		</svg>
+	</button>
+	<div class="alert-message">
+		{{ message|raw }}
+	</div>
+</div>
+{% endif %}
+{% if label == "success" %}
+<div class="alert alert-success alert-dismissible rounded-0 mb-0 relative" role="alert">
+	<button type="button" class="absolute top-2 right-2" aria-label="close">
+		<svg class="w-6 h-6 text-green-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+			width="24" height="24" fill="none" viewBox="0 0 24 24">
+			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+				d="M6 18 17.94 6M18 18 6.06 6" />
+		</svg>
+	</button>
+	<div class="alert-message">
+		{{ message|raw }}
+	</div>
+</div>
+{% endif %}
+{% endfor %}
 {% endfor %}

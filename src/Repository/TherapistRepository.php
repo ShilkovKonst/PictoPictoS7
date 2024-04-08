@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Therapist;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -52,6 +53,22 @@ class TherapistRepository extends ServiceEntityRepository implements PasswordUpg
     //            ->getResult()
     //        ;
     //    }
+
+    /**
+     * @return Category[] Returns an array of Category objects
+     */
+    public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir): Paginator
+    {
+        return new Paginator(
+            $this->createQueryBuilder('t')
+                ->orderBy('t.' . $sortBy, $sortDir)
+                ->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+            false
+        );
+    }
 
     //    public function findOneBySomeField($value): ?Therapist
     //    {

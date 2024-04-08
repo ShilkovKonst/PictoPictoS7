@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "bootstrap/dist/css/bootstrap.min.css";
-
 body {
   min-width: 360px;
 }
@@ -13,16 +11,22 @@ form div div ul {
 
 @layer components {
   .alert {
-    @apply z-10 p-4 text-sm rounded-lg w-full;
+    @apply z-50 p-4 pr-7 text-sm w-full;
   }
   .alert-danger {
     @apply text-red-800 bg-red-50 shadow-danger-inset-2/4;
   }
+  .alert-warning {
+    @apply text-yellow-800 bg-yellow-50 shadow-warning-inset-2/4;
+  }
   .alert-success {
     @apply text-green-800 bg-green-50 shadow-success-inset-2/4;
   }
-  .btn-login {
+  .btn-b {
     @apply cursor-pointer shadow-outset-8/16 hover:shadow-outset-6/10 transition ease-in-out duration-300 scale-100 hover:scale-95 w-44 h-12 rounded-3xl mb-12 mt-3 md:mt-6 font-bold text-sm tracking-[1.25px] bg-pbg text-[#f9f9f9] border-none outline-none;
+  }
+  .btn-a {
+    @apply shadow-outset-8/16 hover:shadow-outset-6/10 transition ease-in-out duration-300 scale-100 hover:scale-95 h-5 sm:h-10 rounded-3xl px-2 my-3 font-bold text-sm tracking-[1.25px] bg-pbg text-[#f9f9f9] border-none outline-none;
   }
   .input-text {
     @apply z-10 w-full h-10 my-1 pl-6 text-sm tracking-[0.15px] border-none outline-none bg-[#ecf0f3] rounded-lg shadow-inset-2/4 focus:shadow-inset-4/4 transition duration-300 ease-in-out;
