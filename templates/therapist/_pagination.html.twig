@@ -1,4 +1,14 @@
 <div class=" md:absolute bottom-10 right-0 left-0 flex flex-row items-center justify-center gap-3">
+
+  <div class=" min-w-5 sm:min-w-10">
+    {% if page != 1 %}
+    <a href="{{ path(path, { sortBy, sortDir, page: 1 }) }}"
+      class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
+      {{ 1 }}
+    </a>
+    {% endif %}
+  </div>
+
   <div class=" min-w-5 sm:min-w-10">
     {% if page > step %}
     <a href="{{ path(path, { sortBy, sortDir, page: page - step }) }}"
@@ -24,28 +34,10 @@
     {% endif %}
   </div>
 
-  <div class=" min-w-5 sm:min-w-10">
-    {% if page != 1 %}
-    <a href="{{ path(path, { sortBy, sortDir, page: 1 }) }}"
-      class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
-      {{ 1 }}
-    </a>
-    {% endif %}
-  </div>
-
   <p
     class="h-10 rounded-3xl px-2 my-3 font-bold text-sm tracking-[1.25px] text-pbg bg-[#f9f9f9] border-none outline-none w-auto min-w-10 flex flex-row justify-center items-center">
     {{ page }}
   </p>
-
-  <div class=" min-w-5 sm:min-w-10">
-    {% if page != maxPages %}
-    <a href="{{ path(path, { sortBy, sortDir, page: maxPages }) }}"
-      class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
-      {{ maxPages }}
-    </a>
-    {% endif %}
-  </div>
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page < maxPages %} 
@@ -73,5 +65,13 @@
       {% endif %}
   </div>
 
+  <div class=" min-w-5 sm:min-w-10">
+    {% if page != maxPages %}
+    <a href="{{ path(path, { sortBy, sortDir, page: maxPages }) }}"
+      class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
+      {{ maxPages }}
+    </a>
+    {% endif %}
+  </div>
 
 </div>

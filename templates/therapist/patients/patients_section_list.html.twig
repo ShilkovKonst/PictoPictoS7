@@ -10,8 +10,12 @@
       </td>
       <td class="text-center md:text-start w-1/3">{{ patient.birthDate|date("Y-m-d") }}</td>
       <td class="text-center md:text-start w-1/3">
-        {% include "/therapist/_table_actions.html.twig" with {path1: 'therapist_patients_get_one', path2:
-        'therapist_patients_desactivate_one', code: patient.code, entity: 'dossier'} %}
+        {% include "/therapist/_actions_table.html.twig" with {
+        path1: 'therapist_patients_update_one',
+        path2: 'therapist_patients_desactivate_one',
+        code: patient.code,
+        entity: 'dossier'
+        } %}
       </td>
     </tr>
     {% endfor %}

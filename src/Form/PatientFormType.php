@@ -62,7 +62,7 @@ class PatientFormType extends AbstractType
             ])
             ->add('noteComment', TextareaType::class, [
                 'label' => 'Décrire la situation initiale',
-                'required' => true,
+                'required' => false,
                 'mapped' => false,
                 'attr' => [
                     'placeholder' => 'Décrire la situation du patient'

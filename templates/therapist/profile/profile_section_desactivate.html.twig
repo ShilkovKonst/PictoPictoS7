@@ -1,0 +1,61 @@
+<table class="table w-full">
+    <tbody class="flex flex-col gap-2">
+      <tr class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+        <th class="text-start w-[40%] lg:w-[20%]">Nom</th>
+        <td class="text-start w-[45%] lg:w-[30%]">{{ app.user.lastName}}</td>
+        <th class="text-start w-[40%] lg:w-[20%]">Prénom</th>
+        <td class="text-start w-[45%] lg:w-[30%]">{{ app.user.firstName}}</td>
+      </tr>
+      <tr class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+        <th class="text-start w-[40%] lg:w-[20%]">Fonction</th>
+        <td class="text-start w-[45%] lg:w-[30%]">{{ app.user.job }}</td>
+        <th class="text-start w-[40%] lg:w-[20%]">Institution</th>
+        <td class="text-start w-[45%] lg:w-[30%]">{{ app.user.institution.title }}</td>
+      </tr>
+      <tr class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+        <th class="text-start w-[20%] lg:w-[15%]">Email</th>
+        <td class="text-start flex items-center w-[75%] lg:w-[55%]">
+          {{ app.user.email }}
+          <div class="relative group text-center w-auto ml-1">
+            {% if app.user.isVerified %}
+            <svg class="w-6 h-6 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+            </svg>
+            {% else %}
+            <svg class="cursor-pointer w-6 h-6 text-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+              width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd"
+                d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
+                clip-rule="evenodd" />
+            </svg>
+            <div class="hidden group-hover:block absolute bottom-6 -right-8 w-72 rounded-lg alert-danger p-4">
+              <p class="text-red-800">Votre email n'est pas vérifié.</p>
+              <a class="font-semibold underline decoration-1" href="{{ path('app_verify_email_resend') }}">Renvoyer
+                l'email de
+                vérification</a>
+            </div>
+            {% endif %}
+          </div>
+        </td>
+        <th class="text-start w-[20%] lg:w-[15%]">Status</th>
+        <td class="text-start w-[75%] lg:w-[15%]">
+          {% if app.user.isActive %}
+          <svg class="w-6 h-6 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path
+              d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+          </svg>
+          {% else %}
+          <svg class="cursor-pointer w-6 h-6 text-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
+              clip-rule="evenodd" />
+          </svg>
+          {% endif %}
+        </td>
+      </tr>
+    </tbody>
+  </table>

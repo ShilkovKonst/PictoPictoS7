@@ -2,11 +2,15 @@
 
 namespace App\Controller\Therapist;
 
+use App\Form\RegistrationFormType;
+use App\Form\TherapistUpdateFormType;
 use App\Repository\CategoryRepository;
 use App\Repository\InstitutionRepository;
 use App\Repository\PatientRepository;
 use App\Repository\PictogramRepository;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,33 +31,66 @@ class MainController extends AbstractController
     #[Route('/', name: "therapist_index")]
     public function index(): Response
     {
+        return $this->redirectToRoute("therapist_profile");
+    }
+
+    #[Route('/profile', name: "therapist_profile")]
+    public function profile(): Response
+    {
+        return $this->render('therapist/index.html.twig');
+    }
+
+    #[Route('/profile/update', name: "therapist_profile_update")]
+    public function updateProfile(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(TherapistUpdateFormType::class, $user);
+        $form->handleRequest($request);
+
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $firstName = $form->get('firstName')->getData();
+            $user->setFirstName($firstName);
+            $lastName = $form->get('lastName')->getData();
+            $user->setLastName($lastName);
+            $phoneNumber = $form->get('phoneNumber')->getData();
+            $user->setPhoneNumber($phoneNumber);
+            $job = $form->get('job')->getData();
+            $user->setJob($job);
+            $user->setUpdatedAt(new DateTimeImmutable());
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Vos données sont mises à jour.');
+
+            return $this->redirectToRoute("therapist_profile");
+        } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
+            $errors = $form->getErrors(true);
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            $this->addFlash('danger', implode('<br>', $errorMessages));
+        }
+
+        // TODO: all functionality
         return $this->render('therapist/index.html.twig', [
-            'controller_name' => 'AdminController',
+            'userForm' => $form
         ]);
     }
-    #[Route('/test', name: "therapist_test")]
-    public function test(): Response
-    {
-        $this->addFlash('danger', "Test of danger flash");
-        $this->addFlash('warning', "Test of warning flash");
-        $this->addFlash('success', "Test of success flash");
-        
-        return $this->redirectToRoute("therapist_index");
-    }
 
-    #[Route('/profile/edit', name: "therapist_profile_edit")]
-    public function profileEdit(): Response
+    #[Route('/profile/desactivate', name: "therapist_profile_desactivate")]
+    public function deleteProfile(): Response
     {
-        // TODO: all functionnality
+        // TODO: all functionality
         return $this->render('therapist/index.html.twig', []);
     }
 
-    #[Route('/profile/delete', name: "therapist_profile_delete")]
-    public function profileDelete(): Response
-    {
-        // TODO: all functionnality
-        return $this->render('therapist/index.html.twig', []);
-    }
+
+
+
+
 
     #[Route('/therapists', name: "therapist_therapists")]
     public function getAllTherapists(Request $request): Response
@@ -81,43 +118,6 @@ class MainController extends AbstractController
             'sortDir' => $sortDir
         ]);
     }
-
-    // #[Route('/patients', name: "therapist_patients")]
-    // public function getAllPatients(Request $request): Response
-    // {
-    //     $sortBy = $request->query->getString('sortBy', 'id');
-    //     $sortDir = $request->query->getString('sortDir', 'ASC');
-    //     $page = $request->query->getInt('page', 1);
-    //     $limit = 5;
-    //     $step = 5;     
-    //     /** @var Therapist $user */
-    //     $user = $this->getUser();
-    //     if (in_array('ROLE_USER', $user->getRoles())) {
-    //         /** @var ArrayCollection $patients */
-    //         $patients = $this->patRepo->findAllWithPaginator($limit, $page, $sortBy, $sortDir);
-    //         $count = $patients->count();
-    //         $maxPages = ceil($count / $limit);
-    //         if ($page < 1) $page = 1;   
-    //         if ($page > $maxPages) $page = $maxPages;
-    //     } else {
-    //         /** @var ArrayCollection $patients */
-    //         $patients = $this->patRepo->findByTherapistWithPaginator($user->getId(), $limit, $page, $sortBy, $sortDir);
-    //         $count = $patients->count();
-    //         $maxPages = ceil($count / $limit);
-    //         if ($page < 1) $page = 1;   
-    //         if ($page > $maxPages) $page = $maxPages;
-    //     }
-
-    //     return $this->render('therapist/index.html.twig', [
-    //         'patients' => $patients,
-    //         'page' => $page,
-    //         'maxPages' => $maxPages,
-    //         'step' => $step,
-    //         'count' => $count,
-    //         'sortBy' => $sortBy,
-    //         'sortDir' => $sortDir
-    //     ]);
-    // }
 
     #[Route('/categories', name: "therapist_categories")]
     public function getAllCategories(Request $request): Response

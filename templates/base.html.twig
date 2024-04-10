@@ -20,8 +20,9 @@
         {% include "_partials/_flash.html.twig" %}
     </div>
     {% block body %}
-    {% block phrase %} {# Champs Phrase #}
-    {% if patient is defined %}
+    {# {% block phrase %}  #}
+    {# Champs Phrase #}
+    {# {% if patient is defined %}
     {{ form_start(formText) }}
     <div id="sentence" class="d-flex align-items-center">
         <div id="sentenceField" class="flex-grow-1 text-center py-1">
@@ -31,9 +32,9 @@
         <button id="test2" type="button" class="btn btn-sm px-3" data-toggle="modal" data-target="#sentenceConf">
             <i class="fas fa-star fa-3x"></i>
         </button>
-    </div>
+    </div> #}
     {# Champs Phrase #} {# Modal de Confirmation de Sauvegarde de Phrase #}
-    <div class="modal fade" id="sentenceConf" tabindex="-1" role="dialog" aria-labelledby="sentenceConf"
+    {# <div class="modal fade" id="sentenceConf" tabindex="-1" role="dialog" aria-labelledby="sentenceConf"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -43,9 +44,9 @@
                 <div class="modal-footer d-flex justify-content-around border-0">
                     <button type="button" class="btn btn-danger rounded-pill" data-dismiss="modal">
                         <i class="bi bi-x"></i>
-                    </button>
+                    </button> #}
                     {# Bouton Submit #}
-                    {{ form_row(formText.submit)
+                    {# {{ form_row(formText.submit)
                     }}<button type="submit" class="btn btn-success rounded-pill">
                         <i class="bi bi-check2"></i>
                     </button>
@@ -53,16 +54,16 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> #}
     {# end Modal de Confirmation de Sauvegarde de Phrase #}
-    {% else %}
+    {# {% else %}
     <div id="sentence" class="flex items-center">
         <div id="sentenceField" class="flex-grow text-center py-1">
             <span id="sentenceText"></span>
         </div>
     </div>
     {% endif %}
-    {% endblock %}
+    {% endblock %} #}
     {% endblock %}
 </body>
 

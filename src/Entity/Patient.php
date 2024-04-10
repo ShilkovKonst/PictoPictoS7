@@ -216,7 +216,7 @@ class Patient
 
     public function setCode($code): static
     {
-        $this->code = strtolower($code);
+        $this->code = $code;
 
         return $this;
     }

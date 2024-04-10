@@ -1,0 +1,26 @@
+<div class="">
+  <p class="text-lg text-center font-bold p-2 border-b">
+    <span class="font-normal">Desactivation du dossier</span>
+    {{ patient.code }}
+  </p>
+  <div>
+    <p class=" text-base tracking-[0.25px] leading-relaxed m-1">
+      Après la désactivation du dossier du patient, vous ne pourrez plus :
+    </p>
+    <ul class="list-inside list-disc text-base tracking-[0.25px] leading-relaxed m-1">
+      <li><span class="font-bold">modifier les données</span> du patient</li>
+      <li><span class="font-bold">prendre des notes</span> sur l'état du patient</li>
+      <li><span class="font-bold">créer des sessions</span> de jeu pour le patient</li>
+    </ul>
+    <p class=" text-base tracking-[0.25px] leading-relaxed m-1">
+      Toutes les fonctionnalités seront bloquées, seule la visualisation des données initiales de l'utilisateur
+      désactivé sera possible.
+    </p>
+  </div>
+  <form>
+    <label for="mdp">Verifier votre mot de passe</label>
+    <input id="mdp" name="password" type="password">
+    <button type="submit">Desactiver</button>
+  </form>
+</div>
+<div></div>

@@ -1,40 +1,49 @@
+<div class="text-lg text-center font-bold p-2 border-b"><span class="font-normal">Dossier</span> {{ patient.code }}</div>
+
 {{ form_start(patientForm, {
 'attr': {
-'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full'
+'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full p-2'
 }
 }) }}
 <div class="w-full grid grid-cols-1 md:grid-cols-2 sm:gap-2 md:gap-4">
   {{ form_row(patientForm.firstName, {
   'attr': {
   'class': 'input-text z-10',
-  }
+  },
+  'value' : patient.firstName
   }) }}
   {{ form_row(patientForm.lastName, {
   'attr': {
   'class': 'input-text z-10',
-  }
+  },
+  'value' : patient.lastName
   }) }}
   {{ form_row(patientForm.grade, {
   'attr': {
   'class': 'input-text z-10',
-  }
+  },
+  'value' : patient.grade
   }) }}
   {{ form_row(patientForm.sex, {
   'attr': {
   'class': 'input-text z-10',
-  }
+  },
+  'value' : patient.sex
   }) }}
   {{ form_row(patientForm.birthDate, {
   'attr': {
   'class': 'input-text z-10',
-  }
+  },
+  'value' : patient.birthDate|date("Y-m-d")
   }) }}
   {{ form_row(patientForm.noteComment, {
   'attr': {
-  'class': 'input-text z-10',
-  }
+  'required': false,
+  'class': 'input-text z-10 hidden',
+  },
+  'label' : false
   }) }}
 </div>
 
-<button type="submit" class="btn-b">S'inscrire</button>
+<button type="submit" class="btn-b">Valider</button>
 {{ form_end(patientForm) }}

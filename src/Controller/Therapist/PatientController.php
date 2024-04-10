@@ -66,37 +66,42 @@ class PatientController extends AbstractController
     #[Route('/create', name: "therapist_patients_create_one")]
     public function createOnePatient(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        if ($this->getUser() == null) {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user == null) {
             return $this->redirectToRoute('therapist_index');
         }
 
-        /** @var User $user */
-        $user = $this->getUser();
-        
         $patient = new Patient();
         $form = $this->createForm(PatientFormType::class, $patient);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $firstName = $form->get('firstName')->getData();
-            $patient->setFirstName($firstName);
             $lastName = $form->get('lastName')->getData();
-            $patient->setLastName($lastName);
             $patient->setGrade($form->get('grade')->getData());
             $birthDate = DateTimeImmutable::createFromMutable($form->get('birthDate')->getData());
+            $sex = $form->get('sex')->getData();
+            $patient->setFirstName($firstName);
+            $patient->setLastName($lastName);
             $patient->setBirthDate($birthDate);
-            $patient->setSex($form->get('sex')->getData());            
+            $patient->setSex($sex);
             $patient->setIsActive(true);
             $patient->setCreatedAt(new DateTimeImmutable());
             $patient->setUpdatedAt(new DateTimeImmutable());
             $patient->setTherapist($user);
-            $code = $user->getFirstName()[0] . $user->getLastName()[0] . '-' . $firstName[0] . $lastName[0] . '-' . $birthDate->format('Ymd');
-            $code = $slugger->slug($code);
+            $code = substr($user->getFirstName(), 0, 2) . substr($user->getLastName(), 0, 2) . '-' . substr($firstName, 0, 2) . substr($lastName, 0, 2) . '-' . $birthDate->format('Ymd');
+            $code = strtolower($slugger->slug($code));
             $patient->setCode($code);
 
             $note = new Note();
             $note->setEstimation('initial');
-            $note->setComment($form->get('noteComment')->getData());
+            $noteComment = $form->get('noteComment')->getData();
+            if ($noteComment == NULL || $noteComment == '') {
+                $noteComment = 'Initialisation du dossier de ' . $sex == 'homme' ? 'Mr ' : 'Mme ' . $firstName . ' ' . $lastName;
+            } 
+            $note->setComment($noteComment);
             $note->setTherapist($user);
             $note->setCreatedAt(new DateTimeImmutable());
             $note->setUpdatedAt(new DateTimeImmutable());
@@ -129,7 +134,7 @@ class PatientController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        dd($request->getPathInfo());
+        // dd($request->getPathInfo());
         $patient = $this->patRepo->findOneByCode($code);
         // dd($patient);
 
@@ -138,8 +143,56 @@ class PatientController extends AbstractController
         ]);
     }
 
+    #[Route('/{code}/update', name: "therapist_patients_update_one")]
+    public function updatePatientByCode($code, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $patient = $this->patRepo->findOneByCode($code);
+
+        $form = $this->createForm(PatientFormType::class, $patient);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $firstName = $form->get('firstName')->getData();
+            $patient->setFirstName($firstName);
+            $lastName = $form->get('lastName')->getData();
+            $patient->setLastName($lastName);
+            $patient->setGrade($form->get('grade')->getData());
+            $birthDate = DateTimeImmutable::createFromMutable($form->get('birthDate')->getData());
+            $patient->setBirthDate($birthDate);
+            $patient->setSex($form->get('sex')->getData());
+            $patient->setIsActive(true);
+            $patient->setUpdatedAt(new DateTimeImmutable());
+            $code = substr($user->getFirstName(), 0, 2) . substr($user->getLastName(), 0, 2) . '-' . substr($firstName, 0, 2) . substr($lastName, 0, 2) . '-' . $birthDate->format('Ymd');
+            $code = strtolower($slugger->slug($code));
+            $patient->setCode($code);
+
+            $entityManager->persist($patient);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Les données du patient sont mises à jour.');
+
+            return $this->redirectToRoute("therapist_patients_get_one", [
+                'code' => $code
+            ]);
+        } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
+            $errors = $form->getErrors(true);
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            $this->addFlash('danger', implode('<br>', $errorMessages));
+        }
+
+        return $this->render('therapist/index.html.twig', [
+            'patientForm' => $form,
+            'patient' => $patient
+        ]);
+    }
+
     #[Route('/{code}/delete', name: "therapist_patients_desactivate_one")]
-    public function deletePatientById($code): Response
+    public function desactivatePatientByCode($code, Request $request): Response
     {
         /** @var User $user */
         $user = $this->getUser();
