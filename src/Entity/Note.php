@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\UpdatedAtTrait;
 use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,33 +11,41 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 class Note
 {
+    use CreatedAtTrait;
+    use UpdatedAtTrait;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id;
 
+    #[ORM\Column(length: 50)]
+    private ?string $estimation = null;
+
     #[ORM\Column(type: Types::TEXT)]
     private ?string $comment;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at;
+    #[ORM\ManyToOne(inversedBy: 'notes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $therapist = null;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Patient $patient;
-
-    #[ORM\ManyToOne(inversedBy: 'notes')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Therapist $therapist = null;
+    private ?Patient $patient = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function getEstimation(): ?string
     {
-        $this->id = $id;
+        return $this->estimation;
+    }
+
+    public function setEstimation(string $estimation): static
+    {
+        $this->estimation = $estimation;
 
         return $this;
     }
@@ -52,14 +62,14 @@ class Note
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getTherapist(): ?User
     {
-        return $this->created_at;
+        return $this->therapist;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setTherapist(?User $therapist): static
     {
-        $this->created_at = $created_at;
+        $this->therapist = $therapist;
 
         return $this;
     }
@@ -69,21 +79,9 @@ class Note
         return $this->patient;
     }
 
-    public function setPatient(?Patient $patient): self
+    public function setPatient(?Patient $patient): static
     {
         $this->patient = $patient;
-
-        return $this;
-    }
-
-    public function getTherapist(): ?Therapist
-    {
-        return $this->therapist;
-    }
-
-    public function setTherapist(?Therapist $therapist): static
-    {
-        $this->therapist = $therapist;
 
         return $this;
     }

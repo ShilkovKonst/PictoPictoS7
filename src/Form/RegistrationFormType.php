@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Institution;
 use App\Entity\Therapist;
+use App\Entity\User;
 use App\Repository\InstitutionRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -66,6 +67,13 @@ class RegistrationFormType extends AbstractType
                     'placeholder' => 'Votre Fonction'
                 ],
             ])
+            ->add('phoneNumber', TextType::class, [
+                'label' => false,
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Votre numéro de téléphone'
+                ],
+            ])
             ->add('codeInstitution', TextType::class, [
                 'label' => false,
                 'required' => true,
@@ -84,7 +92,7 @@ class RegistrationFormType extends AbstractType
                     return $i ? $i->getCode() : '';
                 },
                 'choice_label' => function (?Institution $i) {
-                    return $i ? $i->getName() : 'Choisir votre Institut';
+                    return $i ? $i->getTitle() : 'Choisir votre Institut';
                 },
                 'choice_attr' => [
                     'class' => 'input-text'
@@ -149,32 +157,13 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
-            // ->add('checkPassword', PasswordType::class, [
-            //     'label' => false,
-            //     'required' => true,
-            //     'mapped' => false,
-            //     'attr' => [
-            //         'placeholder' => 'Verifier mot de passe'
-            //     ],
-            //     'constraints' => [
-            //         new NotBlank([
-            //             'message' => 'Please verify a password',
-            //         ]),
-            //         new Length([
-            //             'min' => 8,
-            //             'minMessage' => 'Your password should be at least {{ limit }} characters',
-            //             // max length allowed by Symfony for security reasons
-            //             'max' => 4096,
-            //         ]),
-            //     ],
-            // ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Therapist::class,
+            'data_class' => User::class,
         ]);
     }
 }

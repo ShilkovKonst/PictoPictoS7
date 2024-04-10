@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Therapist;
+use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\InstitutionRepository;
 use App\Security\EmailVerifier;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -33,7 +35,11 @@ class RegistrationController extends AbstractController
     #[Route('/inscription', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {
-        $user = new Therapist();
+        if ($this->getUser() != null) {
+            return $this->redirectToRoute('therapist_index');
+        }
+        
+        $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
@@ -47,7 +53,6 @@ class RegistrationController extends AbstractController
             $user->setLastName($form->get('lastName')->getData());
             $user->setEmail($form->get('email')->getData());
             $user->setJob($form->get('job')->getData());
-
             $user->setInstitution($this->iRepo->findOneByCode($form->get('codeInstitution')->getData()));
 
             // encode the plain password
@@ -57,6 +62,10 @@ class RegistrationController extends AbstractController
                     $form->get('plainPassword')->getData()
                 )
             );
+            
+            $user->setIsActive(true);
+            $user->setCreatedAt(new DateTimeImmutable());
+            $user->setUpdatedAt(new DateTimeImmutable());
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -104,13 +113,13 @@ class RegistrationController extends AbstractController
         // @TODO Change the redirect on success and handle or remove the flash message in your templates
         $this->addFlash('success', 'Votre adresse email a été vérifiée.');
 
-        return $this->redirectToRoute('admin_index');
+        return $this->redirectToRoute('therapist_index');
     }
     
     #[Route('/verify/email/resend', name: 'app_verify_email_resend')]
     public function resendVerifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
-        /** @var Therapist $user */
+        /** @var User $user */
         $user=$this->getUser();
         if (!$user) {
             $this->addFlash('danger', "Vous devez être connecté pour accéder à cette page!");
@@ -118,7 +127,7 @@ class RegistrationController extends AbstractController
         }        
         if ($user->isVerified()) {
             $this->addFlash('warning', "Votre compte est déjà activé.");
-            return $this->redirectToRoute('admin_index');
+            return $this->redirectToRoute('therapist_index');
         }
 
         $this->emailVerifier->sendEmailConfirmation(
@@ -132,6 +141,6 @@ class RegistrationController extends AbstractController
         );
         $this->addFlash('warning', 'Un email avec les instructions de confirmation a été envoyé à votre adresse email. Veuillez vérifier votre boîte de réception.');
 
-        return $this->redirectToRoute('admin_index');
+        return $this->redirectToRoute('therapist_index');
     }
 }

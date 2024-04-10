@@ -2,52 +2,55 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\AudioPhrase;
 use App\Entity\Category;
 use App\Entity\Institution;
 use App\Entity\Note;
 use App\Entity\Patient;
-use App\Entity\PictogramAdjective;
-use App\Entity\PictogramNoun;
-use App\Entity\PictogramOthers;
-use App\Entity\PictogramPronoun;
-use App\Entity\PictogramVerb;
+use App\Entity\Phrase;
+use App\Entity\Pictogram;
 use App\Entity\Question;
-use App\Entity\Sentence;
-use App\Entity\Therapist;
+use App\Entity\Tag;
+use App\Entity\User;
 use App\Repository\CategoryRepository;
 use App\Repository\InstitutionRepository;
 use App\Repository\PatientRepository;
-use App\Repository\TherapistRepository;
-use DateTime;
+use App\Repository\TagRepository;
+use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
 {
   private UserPasswordHasherInterface $hasher;
 
   private InstitutionRepository $iRepo;
-  private TherapistRepository $thRepo;
+  private UserRepository $uRepo;
   private CategoryRepository $cRepo;
   private PatientRepository $patRepo;
+  private TagRepository $tagRepo;
 
   public function __construct(
     UserPasswordHasherInterface $hasher,
 
     InstitutionRepository $iRepo,
-    TherapistRepository $thRepo,
+    UserRepository $uRepo,
     CategoryRepository $cRepo,
     PatientRepository $patRepo,
+    TagRepository $tagRepo
   ) {
     $this->hasher = $hasher;
 
     $this->iRepo = $iRepo;
-    $this->thRepo = $thRepo;
+    $this->uRepo = $uRepo;
     $this->cRepo = $cRepo;
     $this->patRepo = $patRepo;
+    $this->tagRepo = $tagRepo;
   }
 
   public function load(ObjectManager $manager): void
@@ -64,10 +67,17 @@ class AppFixtures extends Fixture
     $this->populateSubCategory($manager);
     $manager->flush();
 
+    $this->populateTag($manager);
+    $manager->flush();
+
     $this->populatePictogramPronoun($manager);
+    $this->populatePictogramNumber($manager);
     $this->populatePictogramNoun($manager);
     $this->populatePictogramVerb($manager);
     $this->populatePictogramAdjective($manager);
+    $this->populatePictogramInterogative($manager);
+    $this->populatePictogramTime($manager);
+    $this->populatePictogramPreposition($manager);
     $this->populatePictogramOthers($manager);
     $manager->flush();
 
@@ -86,12 +96,7 @@ class AppFixtures extends Fixture
 
   private function formatDateTimeImmutableByString(string $string): DateTimeImmutable
   {
-    return \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $string);
-  }
-
-  private function formatBirthDateByString(string $string): DateTime
-  {
-    return \DateTime::createFromFormat('Y-m-d', $string);
+    return \DateTimeImmutable::createFromFormat('Y-m-d', $string);
   }
 
   private function populateInstitution(ObjectManager $manager)
@@ -104,11 +109,45 @@ class AppFixtures extends Fixture
     ];
     foreach ($data as $row) {
       $institution = new Institution();
-      $institution->setName($row[0]);
+      $institution->setTitle($row[0]);
       $institution->setCode($row[1]);
       $institution->setEmail($row[2]);
+      $institution->setPhoneNumber('123456789');
+      $institution->setContactName('Joseph Marsh');
+      $institution->setUpdatedAt(new DateTimeImmutable());
+      $institution->setCreatedAt(new DateTimeImmutable());
+
 
       $manager->persist($institution);
+    }
+  }
+
+  private function populateTag(ObjectManager $manager)
+  {
+    $data = [
+      'verbe',
+      'nom',
+      'adjectif',
+      'nombre',
+      'invariable',
+      'interrogatif',
+      'pronom_ou_determinant',
+      'auxiliaire_avoir',
+      'auxiliaire_etre',
+      'irregulier',
+      'masculin',
+      'feminin',
+      'singulier',
+      'pluriel',
+      'premier',
+      'deuxieme',
+      'troisieme'
+    ];
+    foreach ($data as $title) {
+      $tag = new Tag();
+      $tag->setTitle($title);
+
+      $manager->persist($tag);
     }
   }
 
@@ -126,23 +165,27 @@ class AppFixtures extends Fixture
     ];
     $i = 0;
     foreach ($data as $row) {
-      $therapist = new Therapist();
-      $therapist->setEmail($row[0]);
-      $therapist->setRoles($row[1]);
-      $password = $this->hasher->hashPassword($therapist, $row[2]);
-      $therapist->setPassword($password);
-      $therapist->setFirstName($row[3]);
-      $therapist->setLastName($row[4]);
-      $therapist->setJob($row[5]);
+      $user = new User();
+      $user->setEmail($row[0]);
+      $user->setRoles($row[1]);
+      $password = $this->hasher->hashPassword($user, $row[2]);
+      $user->setPassword($password);
+      $user->setFirstName($row[3]);
+      $user->setLastName($row[4]);
+      $user->setPhoneNumber('123456789');
+      $user->setJob($row[5]);
+      $user->setIsActive(true);
       if ($i % 2 == 0) {
-        $therapist->setInstitution($this->iRepo->findOneByName("CRP"));
+        $user->setInstitution($this->iRepo->findOneByTitle("CRP"));
       } else if ($i % 3 == 0) {
-        $therapist->setInstitution($this->iRepo->findOneByName("ECAM"));
+        $user->setInstitution($this->iRepo->findOneByTitle("ECAM"));
       } else {
-        $therapist->setInstitution($this->iRepo->findOneByName("EntrepriseTest"));
+        $user->setInstitution($this->iRepo->findOneByTitle("EntrepriseTest"));
       }
+      $user->setUpdatedAt(new DateTimeImmutable());
+      $user->setCreatedAt(new DateTimeImmutable());
 
-      $manager->persist($therapist);
+      $manager->persist($user);
       $i++;
     }
   }
@@ -184,24 +227,14 @@ class AppFixtures extends Fixture
       ['Couverts', 'couverts.png']
     ];
 
-    $i = 0;
     foreach ($data as $row) {
       $category = new Category();
-      $category->setName($row[0]);
+      $category->setTitle($row[0]);
       $category->setFilename($row[1]);
       $category->setUpdatedAt(new DateTimeImmutable());
-      if ($i % 4 == 0) {
-        $category->setTherapist($this->thRepo->findOneByEmail("rudrauf.tristan@orange.fr"));
-      } else if ($i % 3 == 0) {
-        $category->setTherapist($this->thRepo->findOneByEmail("palvac@gmail.com"));
-      } else if ($i % 2 == 0) {
-        $category->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
-      } else {
-        $category->setTherapist($this->thRepo->findOneByEmail("palomavacheron@gmail.com"));
-      }
+      $category->setCreatedAt(new DateTimeImmutable());
 
       $manager->persist($category);
-      $i++;
     }
   }
 
@@ -234,52 +267,81 @@ class AppFixtures extends Fixture
     ];
     foreach ($data as $row) {
       $subCat = new Category();
-      $subCat->setName($row[0]);
+      $subCat->setTitle($row[0]);
       $subCat->setFilename($row[1]);
       $subCat->setUpdatedAt(new DateTimeImmutable());
-      $subCat->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+      $subCat->setCreatedAt(new DateTimeImmutable());
 
       if ($row[2] == 10) {
-        $subCat->setSuperCategory($this->cRepo->findOneByName("Petits mots"));
+        $subCat->setSuperCategory($this->cRepo->findOneByTitle("Petits mots"));
       }
       if ($row[2] == 14) {
-        $subCat->setSuperCategory($this->cRepo->findOneByName("Lieux"));
+        $subCat->setSuperCategory($this->cRepo->findOneByTitle("Lieux"));
       }
       if ($row[2] == 18) {
-        $subCat->setSuperCategory($this->cRepo->findOneByName("Personnes"));
+        $subCat->setSuperCategory($this->cRepo->findOneByTitle("Personnes"));
       }
       if ($row[2] == 17) {
-        $subCat->setSuperCategory($this->cRepo->findOneByName("Objets"));
+        $subCat->setSuperCategory($this->cRepo->findOneByTitle("Objets"));
       }
 
       $manager->persist($subCat);
     }
   }
-
+  // Pictograms
   private function populatePictogramPronoun(ObjectManager $manager)
   {
     $data = [
-      ['Je', 'je.png', 'first', 'singular', null],
-      ['Tu', 'je.png', 'second', 'singular', null],
-      ['Il', 'il.png', 'third', 'singular', 'masculin'],
-      ['Elle', 'elle.png', 'third', 'singular', 'feminin'],
-      ['Nous', 'nous.png', 'first', 'plurial', null],
-      ['Vous', 'vous.png', 'second', 'plurial', null],
-      ['Ils', 'ils.png', 'third', 'plurial', 'masculin'],
-      ['Elles', 'elles.png', 'third', 'plurial', 'feminin']
+      ['Je', 'je.png', 'premier', 'singulier', null],
+      ['Tu', 'je.png', 'deuxieme', 'singulier', null],
+      ['Il', 'il.png', 'troisieme', 'singulier', 'masculin'],
+      ['Elle', 'elle.png', 'troisieme', 'singulier', 'feminin'],
+      ['Nous', 'nous.png', 'premier', 'pluriel', null],
+      ['Vous', 'vous.png', 'deuxieme', 'pluriel', null],
+      ['Ils', 'ils.png', 'troisieme', 'pluriel', 'masculin'],
+      ['Elles', 'elles.png', 'troisieme', 'pluriel', 'feminin']
     ];
     foreach ($data as $row) {
-      $pictogram = new PictogramPronoun();
-      $pictogram->setName($row[0]);
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
       $pictogram->setFilename($row[1]);
-      $pictogram->setPerson($row[2]);
-      $pictogram->setNumber($row[3]);
+      $pictogram->setType('pronom_ou_determinant');
+      $pictogram->addTag($this->tagRepo->findOneByTitle($row[2]));
+      $pictogram->addTag($this->tagRepo->findOneByTitle($row[3]));
       if ($row[4] != null) {
-        $pictogram->setGenre($row[4]);
+        $pictogram->addTag($this->tagRepo->findOneByTitle($row[4]));
       }
-      $pictogram->setCategory($this->cRepo->findOneByName("Sujets"));
+      $pictogram->setCategory($this->cRepo->findOneByTitle("Sujets"));
       $pictogram->setUpdatedAt(new DateTimeImmutable());
-      $pictogram->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+      $pictogram->setCreatedAt(new DateTimeImmutable());
+
+      $manager->persist($pictogram);
+    }
+  }
+
+  private function populatePictogramNumber(ObjectManager $manager)
+  {
+    $data = [
+      ['Zéro', 'zero.png', 7],
+      ['Un', 'un.png', 7],
+      ['Deux', 'deux.png', 7],
+      ['Trois', 'trois.png', 7],
+      ['Quatre', 'quatre.png', 7],
+      ['Cinq', 'cinq.png', 7],
+      ['Six', 'six.png', 7],
+      ['Sept', 'sept.png', 7],
+      ['Huit', 'huit.png', 7],
+      ['Neuf', 'neuf.png', 7],
+      ['Dix', 'dix.png', 7],
+    ];
+    foreach ($data as $row) {
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
+      $pictogram->setFilename($row[1]);
+      $pictogram->setType('nombre');
+      $pictogram->setCategory($this->cRepo->findOneByTitle("Chiffres"));
+      $pictogram->setUpdatedAt(new DateTimeImmutable());
+      $pictogram->setCreatedAt(new DateTimeImmutable());
 
       $manager->persist($pictogram);
     }
@@ -575,79 +637,76 @@ class AppFixtures extends Fixture
 
     ];
     foreach ($data as $row) {
-      $pictogram = new PictogramNoun();
-      $pictogram->setName($row[0]);
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
       $pictogram->setFilename($row[1]);
-      $pictogram->setGenre($row[2]);
-      if ($row[3] != null) {
-        $pictogram->setSingular($row[3]);
-      }
-      if ($row[4] != null) {
-        $pictogram->setPlurial($row[4]);
-      }
+      $pictogram->setType('nom');
+      $pictogram->addTag($this->tagRepo->findOneByTitle($row[2]));
+
+      $pictogram->setCreatedAt(new DateTimeImmutable());
       $pictogram->setUpdatedAt(new DateTimeImmutable());
-      $pictogram->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+
       switch ($row[5]) {
         case 2:
-          $pictogram->setCategory($this->cRepo->findOneByName("Boissons"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Boissons"));
           break;
         case 5:
-          $pictogram->setCategory($this->cRepo->findOneByName("Aliments"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Aliments"));
           break;
         case 6:
-          $pictogram->setCategory($this->cRepo->findOneByName("Animaux"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Animaux"));
           break;
         case 8:
-          $pictogram->setCategory($this->cRepo->findOneByName("Corps humain"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Corps humain"));
           break;
         case 11:
-          $pictogram->setCategory($this->cRepo->findOneByName("Émotions"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Émotions"));
           break;
         case 12:
-          $pictogram->setCategory($this->cRepo->findOneByName("Fruits et légumes"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Fruits et légumes"));
           break;
         case 14:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lieux"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lieux"));
           break;
         case 15:
-          $pictogram->setCategory($this->cRepo->findOneByName("Météo"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Météo"));
           break;
         case 16:
-          $pictogram->setCategory($this->cRepo->findOneByName("Multimédia"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Multimédia"));
           break;
         case 17:
-          $pictogram->setCategory($this->cRepo->findOneByName("Objets"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Objets"));
           break;
         case 18:
-          $pictogram->setCategory($this->cRepo->findOneByName("Personnes"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Personnes"));
           break;
         case 19:
-          $pictogram->setCategory($this->cRepo->findOneByName("Scolarité"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Scolarité"));
           break;
         case 20:
-          $pictogram->setCategory($this->cRepo->findOneByName("Transports"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Transports"));
           break;
         case 21:
-          $pictogram->setCategory($this->cRepo->findOneByName("Vêtements"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Vêtements"));
           break;
           //subcats
         case 33:
-          $pictogram->setCategory($this->cRepo->findOneByName("Ecole"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Ecole"));
           break;
         case 44:
-          $pictogram->setCategory($this->cRepo->findOneByName("Maison"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Maison"));
           break;
         case 66:
-          $pictogram->setCategory($this->cRepo->findOneByName("Magasins"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Magasins"));
           break;
         case 77:
-          $pictogram->setCategory($this->cRepo->findOneByName("Famille"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Famille"));
           break;
         case 88:
-          $pictogram->setCategory($this->cRepo->findOneByName("Objets de la cuisine"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Objets de la cuisine"));
           break;
         case 99:
-          $pictogram->setCategory($this->cRepo->findOneByName("Objets de la salle de bain"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Objets de la salle de bain"));
           break;
         default:
           break;
@@ -658,11 +717,12 @@ class AppFixtures extends Fixture
 
   private function populatePictogramVerb(ObjectManager $manager)
   {
+    $output = new ConsoleOutput();
     $data = [
       ['Vouloir', 'vouloir.png', 'veux', 'veux', 'veut', 'voulons', 'voulez', 'veulent', 'voudrai', 'voudras', 'voudra', 'voudrons', 'voudrez', 'voudront', 'ai voulu', 'as voulu', 'a voulu', 'avons voulu', 'avez voulu', 'ont voulu', 3],
       ['Regarder', 'regarder.png', 'regarde', 'regardes', 'regarde', 'regardons', 'regardez', 'regardent', 'regarderai', 'regarderas', 'regardera', 'regarderons', 'regarderez', 'regarderont', 'ai regardé', 'as regardé', 'a regardé', 'avons regardé', 'avez regardé', 'ont regardé', 3],
       ['Boire', 'boire.png', 'bois', 'bois', 'boit', 'buvons', 'buvez', 'boivent', 'boirai', 'boiras', 'boira', 'boirons', 'boirez', 'boiront', 'ai bu', 'as bu', 'a bu', 'avons bu', 'avez bu', 'ont bu', 3],
-      ['Manger', 'manger.png', 'mange', 'manges', 'mange', 'mangeons', 'mangez', 'mangent', '2021-03-15 15:15:28', 'mangerai', 'mangeras', 'mangera', 'mangerons', 'mangerez', 'mangeront', 'ai mangé', 'as mangé', 'a mangé', 'avons mangé', 'avez mangé', 'ont mangé', 3],
+      ['Manger', 'manger.png', 'mange', 'manges', 'mange', 'mangeons', 'mangez', 'mangent', 'mangerai', 'mangeras', 'mangera', 'mangerons', 'mangerez', 'mangeront', 'ai mangé', 'as mangé', 'a mangé', 'avons mangé', 'avez mangé', 'ont mangé', 3],
       ['Aller', 'aller.png', 'vais', 'vas', 'va', 'allons', 'allez', 'vont', 'irai', 'iras', 'ira', 'irons', 'irez', 'iront', 'suis allé', 'es allé', 'est allé', 'sommes allés', 'êtes allés', 'sont allés', 3],
       ['Avoir', 'avoir.png', 'ai', 'as', 'a', 'avons', 'avez', 'ont', 'aurai', 'auras', 'aura', 'aurons', 'aurez', 'auront', 'ai eu', 'as eu', 'a eu', 'avons eu', 'avez eu', 'ont eu', 3],
       ['Aller aux toilettes', 'allerAuxToilettes.png', 'vais aux toilettes', 'vas aux toilettes', 'va aux toilettes', 'allons aux toilettes', 'allez aux toilettes', 'vont aux toilettes', 'irai aux toilettes', 'iras aux toilettes', 'ira aux toilettes', 'irons aux toilettes', 'irez aux toilettes', 'iront aux toilettes', 'suis allé aux toilettes', 'es allé aux toilettes', 'est allé aux toilettes', 'sommes allés aux toilettes', 'êtes allés aux toilettes', 'sont allés aux toilettes', 3],
@@ -701,46 +761,79 @@ class AppFixtures extends Fixture
       ['Mordre', 'mordre.png', 'mords', 'mords', 'mord', 'mordons', 'mordez', 'mordent', 'mordrai', 'mordras', 'mordra', 'mordrons', 'mordrez', 'mordront', 'ai mordu', 'as mordu', 'a mordu', 'avons mordu', 'avez mordu', 'ont mordu', 22],
       ['Trépigner', 'trepigner.png', 'trépigne', 'trépigne', 'trépigne', 'trépignons', 'trépignez', 'trépignent', 'trépignerai', 'trépigneras', 'trépignera', 'trépignerons', 'trépignerez', 'trépigneront', 'ai trépigné', 'as trépigné', 'a trépigné', 'avons trépigné', 'avez trépigné', 'ont trépigné', 22],
     ];
+    $irregular = [
+      "être",
+      "avoir",
+      "aller",
+      "faire",
+      "venir",
+      "pouvoir",
+      "vouloir",
+      "devoir",
+      "savoir",
+      "voir",
+      "dire",
+      "savoir",
+      "falloir",
+      "pleuvoir",
+      "recevoir",
+      "savoir",
+      "battre",
+      "boire",
+      "connaître",
+      "courir",
+      "croire",
+      "devoir",
+      "dormir",
+      "écrire",
+      "lire",
+      "mettre",
+      "prendre",
+      "rire",
+      "suivre",
+      "vivre"
+    ];
+    $withEtre = [
+      'arriver',
+      'descendre',
+      'mourir',
+      'partir',
+      'passer',
+      'rester',
+      'retourner',
+      'sortir',
+      'tomber',
+      'venir',
+    ];
     foreach ($data as $row) {
-      $pictogram = new PictogramVerb();
-      $pictogram->setName($row[0]);
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
       $pictogram->setFilename($row[1]);
+      $pictogram->setType('verbe');
 
-      $pictogram->setSingPremPresent($row[2]);
-      $pictogram->setSingDeuxPresent($row[3]);
-      $pictogram->setSingTroisPresent($row[4]);
-      $pictogram->setPlurPremPresent($row[5]);
-      $pictogram->setPlurDeuxPresent($row[6]);
-      $pictogram->setPlurTroisPresent($row[7]);
+      $pictogram->setCreatedAt(new DateTimeImmutable());
+      $pictogram->setUpdatedAt(new DateTimeImmutable());
 
-      $pictogram->setSingPremFutur($row[8]);
-      $pictogram->setSingDeuxFutur($row[9]);
-      $pictogram->setSingTroisFutur($row[10]);
-      $pictogram->setPlurPremFutur($row[11]);
-      $pictogram->setPlurDeuxFutur($row[12]);
-      $pictogram->setPlurTroisFutur($row[13]);
-
-      $pictogram->setSingPremPasse($row[14]);
-      $pictogram->setSingDeuxPasse($row[15]);
-      $pictogram->setSingTroisPasse($row[16]);
-      $pictogram->setPlurPremPasse($row[17]);
-      $pictogram->setPlurDeuxPasse($row[18]);
-      $pictogram->setPlurTroisPasse($row[19]);
+      if (in_array(strtolower($row[0]), $irregular)) {
+        $pictogram->addTag($this->tagRepo->findOneByTitle('irregulier'));
+      }
+      if (in_array(strtolower($row[0]), $withEtre) || strtolower($row[0][0] == 's')) {
+        $pictogram->addTag($this->tagRepo->findOneByTitle('auxiliaire_etre'));
+      } else {
+        $pictogram->addTag($this->tagRepo->findOneByTitle('auxiliaire_avoir'));
+      }
 
       switch ($row[20]) {
         case 3:
-          $pictogram->setCategory($this->cRepo->findOneByName("Actions"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Actions"));
           break;
         case 22:
-          $pictogram->setCategory($this->cRepo->findOneByName("Comportements"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Comportements"));
           break;
         default:
+          $output->writeln($pictogram->getTitle());
           break;
       }
-      $pictogram->setUpdatedAt(new DateTimeImmutable());
-      $pictogram->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
-
-      $pictogram->setCategory($this->cRepo->findOneByName("Sujets"));
 
       $manager->persist($pictogram);
     }
@@ -803,31 +896,69 @@ class AppFixtures extends Fixture
       ['Nuageux', 'nuageux.png', 'nuageux', 'nuageux', 'nuageuse', 'nuageuses', 15],
       ['Orageux', 'orageux.png', 'orageux', 'orageux', 'orageuse', 'orageuses', 15],
     ];
+    $irregular = [
+      "bon",
+      "mauvais",
+      "vieux",
+      "nouveau",
+      "beau",
+      "joli",
+      "grand",
+      "petit",
+      "gros",
+      "long",
+      "haut",
+      "bas",
+      "jeune",
+      "premier",
+      "dernier",
+      "meilleur",
+      "pire",
+      "moindre",
+      "supérieur",
+      "inférieur",
+      "extérieur",
+      "prochain",
+      "ancien",
+      "cher",
+      "libre",
+      "public",
+      "fou",
+      "faux",
+      "doux",
+      "fier",
+      "riche",
+      "pur",
+      "dur",
+      "sûr",
+      "commun",
+      "vif",
+    ];
     foreach ($data as $row) {
-      $pictogram = new PictogramAdjective();
-      $pictogram->setName($row[0]);
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
       $pictogram->setFilename($row[1]);
-
-      $pictogram->setSingMasculin($row[2]);
-      $pictogram->setPlurMasculin($row[3]);
-      $pictogram->setSingFeminin($row[4]);
-      $pictogram->setPlurFeminin($row[5]);
+      $pictogram->setType('adjectif');
+      
+      if (in_array(strtolower($row[0]), $irregular)) {
+        $pictogram->addTag($this->tagRepo->findOneByTitle('irregulier'));
+      }
 
       $pictogram->setUpdatedAt(new DateTimeImmutable());
-      $pictogram->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+      $pictogram->setCreatedAt(new DateTimeImmutable());
 
       switch ($row[6]) {
         case 4:
-          $pictogram->setCategory($this->cRepo->findOneByName("Adjectifs"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Adjectifs"));
           break;
         case 9:
-          $pictogram->setCategory($this->cRepo->findOneByName("Couleurs"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Couleurs"));
           break;
         case 11:
-          $pictogram->setCategory($this->cRepo->findOneByName("Émotions"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Émotions"));
           break;
         case 15:
-          $pictogram->setCategory($this->cRepo->findOneByName("Météo"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Météo"));
           break;
         default:
           break;
@@ -836,79 +967,10 @@ class AppFixtures extends Fixture
       $manager->persist($pictogram);
     }
   }
-
-  private function populatePictogramOthers(ObjectManager $manager)
+  
+  private function populatePictogramInterogative(ObjectManager $manager)
   {
-    $output = new ConsoleOutput();
     $data = [
-      ['Eux', 'eux.png', 1],
-      ['Moi', 'moi.png', 1],
-
-      ['Zéro', 'zero.png', 7],
-      ['Un', 'un.png', 7],
-      ['Deux', 'deux.png', 7],
-      ['Trois', 'trois.png', 7],
-      ['Quatre', 'quatre.png', 7],
-      ['Cinq', 'cinq.png', 7],
-      ['Six', 'six.png', 7],
-      ['Sept', 'sept.png', 7],
-      ['Huit', 'huit.png', 7],
-      ['Neuf', 'neuf.png', 7],
-      ['Dix', 'dix.png', 7],
-
-      ['Aux', 'aux1.png', 10],
-      ['À la', 'aLa.png', 10],
-      ['À', 'a.png', 10],
-
-      ['Ces', 'ces.png', 11],
-      ['Cet', 'cet.png', 11],
-      ['Cette', 'cette.png', 11],
-      ['Ce', 'ce.png', 11],
-      ['Chez', 'chez.png', 11],
-
-      ['De', 'de.png', 12],
-      ['Des', 'des.png', 12],
-      ['Dans', 'dans.png', 12],
-      ['Du', 'du.png', 12],
-
-      ['Et', 'et.png', 13],
-
-      ['Leur', 'leur.png', 14],
-      ['Leurs', 'leurs.png', 14],
-      ['La', 'la.png', 14],
-      ['Le', 'le.png', 14],
-      ['Les', 'les.png', 14],
-
-      ['Ma', 'ma.png', 15],
-      ['Mes', 'mes.png', 15],
-      ['Mon', 'mon.png', 15],
-      ['Mien', 'mien.png', 15],
-      ['Mienne', 'mienne.png', 15],
-      ['Miennes', 'miennes.png', 15],
-
-      ['Nos', 'nos.png', 16],
-      ['Notre', 'notre.png', 16],
-
-      ['Sa', 'sa.png', 17],
-      ['Ses', 'ses.png', 17],
-      ['Son', 'son.png', 17],
-      ['Sien', 'sien.png', 17],
-      ['Sienne', 'sienne.png', 17],
-      ['Siennes', 'siennes.png', 17],
-
-      ['Ta', 'ta.png', 18],
-      ['Tes', 'tes.png', 18],
-      ['Tien', 'tien.png', 18],
-      ['Tienne', 'tienne.png', 18],
-      ['Tiennes', 'tiennes.png', 18],
-      ['Ton', 'ton.png', 18],
-
-      ['Une', 'une.png', 19],
-      ['Un', 'un1.png', 19],
-
-      ['Vos', 'vos.png', 20],
-      ['Votre', 'votre.png', 20],
-
       ['? ', 'interrogatif.png', 36],
       ['Combien', 'interrogatif_combien.png', 36],
       ['Comment', 'interrogatif_comment.png', 36],
@@ -918,7 +980,23 @@ class AppFixtures extends Fixture
       ['Que ', 'interrogatif_que.png', 36],
       ['Qui', 'interrogatif_qui.png', 36],
       ['Quoi ', 'interrogatif_quoi.png', 36],
+    ];
+    foreach ($data as $row) {
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
+      $pictogram->setFilename($row[1]);
+      $pictogram->setType('interrogatif');
+      $pictogram->setCategory($this->cRepo->findOneByTitle("Interrogatif"));
+      $pictogram->setUpdatedAt(new DateTimeImmutable());
+      $pictogram->setCreatedAt(new DateTimeImmutable());
 
+      $manager->persist($pictogram);
+    }
+  }
+  
+  private function populatePictogramTime(ObjectManager $manager)
+  {
+    $data = [
       ['Matin', 'temps_matin.png', 37],
       ['Midi', 'temps_midi.png', 37],
       ['Après-midi ', 'temps_apresmidi.png', 37],
@@ -962,61 +1040,154 @@ class AppFixtures extends Fixture
       ['Deux heures quarante cinq', 'heure_2h45.png', 38],
     ];
     foreach ($data as $row) {
-      $pictogram = new PictogramOthers();
-      $pictogram->setName($row[0]);
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
       $pictogram->setFilename($row[1]);
+      $pictogram->setType('invariable');
+      switch ($row[2]) {
+        case 37:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Journee"));
+          break;
+        case 38:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Heures"));
+          break;
+        default:
+          break;
+      }
+      $pictogram->setUpdatedAt(new DateTimeImmutable());
+      $pictogram->setCreatedAt(new DateTimeImmutable());
+
+      $manager->persist($pictogram);
+    }
+  }
+  
+  private function populatePictogramPreposition(ObjectManager $manager)
+  {
+    $data = [
+      ['Aux', 'aux1.png', 10],
+      ['À la', 'aLa.png', 10],
+      ['À', 'a.png', 10],
+      ['Chez', 'chez.png', 11],
+      ['Dans', 'dans.png', 12],
+      ['De', 'de.png', 12],
+      ['Des', 'des.png', 12],
+      ['Du', 'du.png', 12],
+      ['Et', 'et.png', 13],
+    ];
+    foreach ($data as $row) {
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
+      $pictogram->setFilename($row[1]);
+      $pictogram->setType('invariable');
+      switch ($row[2]) {
+        case 10:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre A"));
+          break;
+        case 11:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre C"));
+          break;
+        case 12:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre D"));
+          break;
+        case 13:
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre E"));
+          break;
+        default:
+          break;
+      }
+      $pictogram->setUpdatedAt(new DateTimeImmutable());
+      $pictogram->setCreatedAt(new DateTimeImmutable());
+
+      $manager->persist($pictogram);
+    }
+  }
+
+  private function populatePictogramOthers(ObjectManager $manager)
+  {
+    $output = new ConsoleOutput();
+    $data = [
+      ['Eux', 'eux.png', 1, 'troisieme', 'pluriel', 'masculin'],
+      ['Moi', 'moi.png', 1, 'premier', 'singulier', null],
+
+      ['Ces', 'ces.png', 11, 'troisieme', 'pluriel', null],
+      ['Cet', 'cet.png', 11, 'troisieme', 'singulier', 'masculin'],
+      ['Cette', 'cette.png', 11, 'troisieme', 'singulier', 'feminin'],
+      ['Ce', 'ce.png', 11, 'troisieme', 'singulier', 'masculin'],
+
+      ['Leur', 'leur.png', 14, null, 'singulier', null],
+      ['Leurs', 'leurs.png', 14, null, 'pluriel', null],
+      ['La', 'la.png', 14, 'troisieme', 'singulier', 'feminin'],
+      ['Le', 'le.png', 14, 'troisieme', 'singulier', 'masculin'],
+      ['Les', 'les.png', 14, 'troisieme', 'pluriel', null],
+
+      ['Mon', 'mon.png', 15, 'premier', 'singulier', 'masculin'],
+      ['Ma', 'ma.png', 15, 'premier', 'singulier', 'feminin'],
+      ['Mes', 'mes.png', 15, 'premier', 'pluriel', null],
+      ['Mien', 'mien.png', 15, 'premier', 'singulier', 'masculin'],
+      ['Miens', 'miens.png', 15, 'premier', 'pluriel', 'masculin'],
+      ['Mienne', 'mienne.png', 15, 'premier', 'singulier', 'feminin'],
+      ['Miennes', 'miennes.png', 15, 'premier', 'pluriel', 'feminin'],
+
+      ['Son', 'son.png', 17, 'troisieme', 'singulier', 'masculin'],
+      ['Sa', 'sa.png', 17, 'troisieme', 'singulier', 'feminin'],
+      ['Ses', 'ses.png', 17, 'troisieme', 'pluriel', null],
+      ['Sien', 'sien.png', 17, 'troisieme', 'singulier', 'masculin'],
+      ['Siens', 'siens.png', 17, 'troisieme', 'pluriel', 'masculin'],
+      ['Sienne', 'sienne.png', 17, 'troisieme', 'singulier', 'feminin'],
+      ['Siennes', 'siennes.png', 17, 'troisieme', 'pluriel', 'feminin'],
+
+      ['Ton', 'ton.png', 18, 'deuxieme', 'singulier', 'masculin'],
+      ['Ta', 'ta.png', 18, 'deuxieme', 'singulier', 'feminin'],
+      ['Tes', 'tes.png', 18, 'deuxieme', 'pluriel', null],
+      ['Tien', 'tien.png', 18, 'deuxieme', 'singulier', 'masculin'],
+      ['Tiens', 'tiens.png', 18, 'deuxieme', 'pluriel', 'masculin'],
+      ['Tienne', 'tienne.png', 18, 'deuxieme', 'singulier', 'feminin'],
+      ['Tiennes', 'tiennes.png', 18, 'deuxieme', 'pluriel', 'feminin'],
+
+      ['Une', 'une.png', 19, null, 'singulier', 'feminin'],
+      ['Un', 'un1.png', 19, null, 'singulier', 'masculin'],
+
+      ['Notre', 'notre.png', 16, 'premier', 'singulier', null],
+      ['Nos', 'nos.png', 16, 'premier', 'pluriel', null],      
+      ['Votre', 'votre.png', 20, 'deuxieme', 'singulier', null],
+      ['Vos', 'vos.png', 20, 'deuxieme', 'pluriel', null],
+    ];
+    foreach ($data as $row) {
+      $pictogram = new Pictogram();
+      $pictogram->setTitle($row[0]);
+      $pictogram->setFilename($row[1]);
+      $pictogram->setType('pronom_ou_determinant');
 
       $pictogram->setUpdatedAt(new DateTimeImmutable());
-      $pictogram->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+      $pictogram->setCreatedAt(new DateTimeImmutable());
 
       switch ($row[2]) {
         case 1:
-          $pictogram->setCategory($this->cRepo->findOneByName("Sujets"));
-          break;
-        case 7:
-          $pictogram->setCategory($this->cRepo->findOneByName("Chiffres"));
-          break;
-        case 10:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre A"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 11:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre C"));
-          break;
-        case 12:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre D"));
-          break;
-        case 13:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre E"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre C"));
           break;
         case 14:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre L"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre L"));
           break;
         case 15:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre M"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre M"));
           break;
         case 16:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre N"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre N"));
           break;
         case 17:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre S"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre S"));
           break;
         case 18:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre T"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre T"));
           break;
         case 19:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre U"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre U"));
           break;
         case 20:
-          $pictogram->setCategory($this->cRepo->findOneByName("Lettre V"));
-          break;
-        case 36:
-          $pictogram->setCategory($this->cRepo->findOneByName("Interrogatif"));
-          break;
-        case 37:
-          $pictogram->setCategory($this->cRepo->findOneByName("Journee"));
-          break;
-        case 38:
-          $pictogram->setCategory($this->cRepo->findOneByName("Heures"));
+          $pictogram->setCategory($this->cRepo->findOneByTitle("Lettre V"));
           break;
         default:
           break;
@@ -1025,6 +1196,7 @@ class AppFixtures extends Fixture
       $manager->persist($pictogram);
     }
   }
+  // end pictograms
 
   private function populateQuestion(ObjectManager $manager)
   {
@@ -1063,205 +1235,207 @@ class AppFixtures extends Fixture
     foreach ($data as $row) {
       $question = new Question();
       $question->setText($row[1]);
+      $question->setUpdatedAt(new DateTimeImmutable());
+      $question->setCreatedAt(new DateTimeImmutable());
       switch ($row[0]) {
         case 1:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Chiffres"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Chiffres"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 2:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Boissons"));
-          $question->addCategory($this->cRepo->findOneByName("Fruits et légumes"));
-          $question->addCategory($this->cRepo->findOneByName("Aliments"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Boissons"));
+          $question->addCategory($this->cRepo->findOneByTitle("Fruits et légumes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Aliments"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 3:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Boissons"));
-          $question->addCategory($this->cRepo->findOneByName("Fruits et légumes"));
-          $question->addCategory($this->cRepo->findOneByName("Aliments"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Boissons"));
+          $question->addCategory($this->cRepo->findOneByTitle("Fruits et légumes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Aliments"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 4:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Boissons"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Boissons"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 5:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Sports"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sports"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 6:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Animaux"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Animaux"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 7:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Couleurs"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Couleurs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 8:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Multimédia"));
-          $question->addCategory($this->cRepo->findOneByName("Objets"));
-          $question->addCategory($this->cRepo->findOneByName("Jouet"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Multimédia"));
+          $question->addCategory($this->cRepo->findOneByTitle("Objets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Jouet"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 9:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 10:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Lieux"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Lieux"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 11:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Corps humain"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Corps humain"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 12:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Comportements"));
-          $question->addCategory($this->cRepo->findOneByName("Émotions"));
-          $question->addCategory($this->cRepo->findOneByName("Adjectifs"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Comportements"));
+          $question->addCategory($this->cRepo->findOneByTitle("Émotions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Adjectifs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 13:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Comportements"));
-          $question->addCategory($this->cRepo->findOneByName("Émotions"));
-          $question->addCategory($this->cRepo->findOneByName("Adjectifs"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Comportements"));
+          $question->addCategory($this->cRepo->findOneByTitle("Émotions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Adjectifs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 14:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Comportements"));
-          $question->addCategory($this->cRepo->findOneByName("Émotions"));
-          $question->addCategory($this->cRepo->findOneByName("Adjectifs"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Comportements"));
+          $question->addCategory($this->cRepo->findOneByTitle("Émotions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Adjectifs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 15:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Couleurs"));
-          $question->addCategory($this->cRepo->findOneByName("Corps humain"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Couleurs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Corps humain"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 16:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Adjectifs"));
-          $question->addCategory($this->cRepo->findOneByName("Météo"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Adjectifs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Météo"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 17:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Vêtements"));
-          $question->addCategory($this->cRepo->findOneByName("Adjectifs"));
-          $question->addCategory($this->cRepo->findOneByName("Météo"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Vêtements"));
+          $question->addCategory($this->cRepo->findOneByTitle("Adjectifs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Météo"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 18:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Corps humain"));
-          $question->addCategory($this->cRepo->findOneByName("Chiffres"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Corps humain"));
+          $question->addCategory($this->cRepo->findOneByTitle("Chiffres"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 19:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Corps humain"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Corps humain"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 20:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Corps humain"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Corps humain"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 21:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Personnes"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Personnes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 22:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Personnes"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Personnes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 23:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Fruits et légumes"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Fruits et légumes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 24:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Personnes"));
-          $question->addCategory($this->cRepo->findOneByName("Lieux"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Personnes"));
+          $question->addCategory($this->cRepo->findOneByTitle("Lieux"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 25:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Couleurs"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Couleurs"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 26:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Lieux"));
-          $question->addCategory($this->cRepo->findOneByName("Sécurité Routière"));
-          $question->addCategory($this->cRepo->findOneByName("Transports"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Lieux"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sécurité Routière"));
+          $question->addCategory($this->cRepo->findOneByTitle("Transports"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 27:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Transports"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Transports"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 28:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Couverts"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Couverts"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 29:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Journee"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Journee"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         case 30:
-          $question->addCategory($this->cRepo->findOneByName("Petits mots"));
-          $question->addCategory($this->cRepo->findOneByName("Heures"));
-          $question->addCategory($this->cRepo->findOneByName("Actions"));
-          $question->addCategory($this->cRepo->findOneByName("Sujets"));
+          $question->addCategory($this->cRepo->findOneByTitle("Petits mots"));
+          $question->addCategory($this->cRepo->findOneByTitle("Heures"));
+          $question->addCategory($this->cRepo->findOneByTitle("Actions"));
+          $question->addCategory($this->cRepo->findOneByTitle("Sujets"));
           break;
         default:
           break;
@@ -1273,26 +1447,37 @@ class AppFixtures extends Fixture
   private function populatePatient(ObjectManager $manager)
   {
     $data = [
-      [[], 'Cyril', 'Acacio', '1985-12-20', 'Bac +2', 'm'],
-      [[], 'Simba', 'Rudrauf', '2018-02-01', 'Test', 'm'],
-      [[], 'Ziggy', 'V', '1999-06-01', 'On ne sait pas', 'f'],
-      [[], 'Patient désactivé numéro 15', 'Patient désactivé numéro 15', '7119-08-29', 'a', 'f'],
-      [[], 'John', 'Doe', '2010-10-20', 'Scolarisé dans une centre spécialisé', 'm'],
-      [[], 'Patient désactivé numéro 17', 'Patient désactivé numéro 17', '2007-02-04', 'Scolarisé dans un centre spécialisé', 'f'],
-      [[], 'Tristan', 'Rudrauf', '1994-10-15', 'Test', 'm'],
-      [[], 'Patient désactivé numéro 20', 'Patient désactivé numéro 20', '1994-10-15', 'Test', 'm'],
-      [[], 'Patient désactivé numéro 21', 'Patient désactivé numéro 21', '2021-07-14', 'Test', 'f'],
-      [[], 'sa', 'sa', '2022-04-16', 'sa', 'm'],
-      [[], 'Emilie', 'Ekon', '2005-02-03', 'lycee', 'f']
+      ['Cyril', 'Acacio', '1985-12-20', 'Bac +2', 'm'],
+      ['Simba', 'Rudrauf', '2018-02-01', 'Test', 'm'],
+      ['Ziggy', 'V', '1999-06-01', 'On ne sait pas', 'f'],
+      ['Patient désactivé numéro 15', 'Patient désactivé numéro 15', '7119-08-29', 'a', 'f'],
+      ['John', 'Doe', '2010-10-20', 'Scolarisé dans une centre spécialisé', 'm'],
+      ['Patient désactivé numéro 17', 'Patient désactivé numéro 17', '2007-02-04', 'Scolarisé dans un centre spécialisé', 'f'],
+      ['Tristan', 'Rudrauf', '1994-10-15', 'Test', 'm'],
+      ['Patient désactivé numéro 20', 'Patient désactivé numéro 20', '1994-10-15', 'Test', 'm'],
+      ['Patient désactivé numéro 21', 'Patient désactivé numéro 21', '2021-07-14', 'Test', 'f'],
+      ['sa', 'sa', '2022-04-16', 'sa', 'm'],
+      ['Emilie', 'Ekon', '2005-02-03', 'lycee', 'f']
     ];
+    $slugger = new AsciiSlugger();
     foreach ($data as $row) {
       $patient = new Patient();
-      $patient->setRoles($row[0]);
-      $patient->setFirstName($row[1]);
-      $patient->setLastName($row[2]);
-      $patient->setBirthDate($this->formatBirthDateByString($row[3]));
-      $patient->setSchoolGrade($row[4]);
-      $patient->setSex($row[5]);
+      $patient->setFirstName($row[0]);
+      $patient->setLastName($row[1]);
+      $birthDate = $this->formatDateTimeImmutableByString($row[2]);
+      $patient->setBirthDate($birthDate);
+      $patient->setGrade($row[3]);
+      $patient->setSex($row[4]);
+      /** @var User $therapist */
+      $therapist = $this->uRepo->findOneByEmail('rudrauf.tristan@orange.fr');
+      $patient->setTherapist($therapist);
+      $patient->setIsActive(true);
+      $patient->setUpdatedAt(new DateTimeImmutable());
+      $patient->setCreatedAt(new DateTimeImmutable());
+      $code = $therapist->getFirstName()[0] . $therapist->getLastName()[0] . '-' . $row[0][0] . $row[1][0] . '-' . $birthDate->format('Ymd');
+      $code = $slugger->slug($code);
+      $patient->setCode($code);
+      
 
       $manager->persist($patient);
     }
@@ -1321,16 +1506,16 @@ class AppFixtures extends Fixture
       /* ********** Setting therapists ************ */
       switch ($row[0]) {
         case 1:
-          $note->setTherapist($this->thRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
+          $note->setTherapist($this->uRepo->findOneByEmail("m.benkherrat@ecam-epmi.com"));
           break;
         case 18:
-          $note->setTherapist($this->thRepo->findOneByEmail("palvac@gmail.com"));
+          $note->setTherapist($this->uRepo->findOneByEmail("palvac@gmail.com"));
           break;
         case 21:
-          $note->setTherapist($this->thRepo->findOneByEmail("rudrauf.tristan@orange.fr"));
+          $note->setTherapist($this->uRepo->findOneByEmail("rudrauf.tristan@orange.fr"));
           break;
         case 24:
-          $note->setTherapist($this->thRepo->findOneByEmail("bleuechabani@gmail.com"));
+          $note->setTherapist($this->uRepo->findOneByEmail("bleuechabani@gmail.com"));
           break;
         default:
           break;
@@ -1376,7 +1561,9 @@ class AppFixtures extends Fixture
       }
 
       $note->setComment($row[2]);
-      $note->setCreatedAt($this->formatDateTimeImmutableByString($row[3]));
+      $note->setEstimation('progress');
+      $note->setUpdatedAt(new DateTimeImmutable());
+      $note->setCreatedAt(new DateTimeImmutable());
 
       $manager->persist($note);
     }
@@ -1427,64 +1614,70 @@ class AppFixtures extends Fixture
       [NULL, 'ecb2c0e7966f6a13d5e68f02801d865a.mp3', '2022-04-16 11:38:07', 22]
     ];
     foreach ($data as $row) {
-      $sentence = new Sentence();
+      $phrase = new Phrase();
+
+      $phrase->setUpdatedAt(new DateTimeImmutable());
+      $phrase->setCreatedAt(new DateTimeImmutable());
+
       if ($row[0] != null) {
-        $sentence->setText($row[0]);
-      }
-      if ($row[1] != null) {
-        $sentence->setAudio($row[1]);
+        $phrase->setText($row[0]);
+      } else {
+        $phrase->setText('lorem ipsum');
       }
 
-      $sentence->setCreatedAt($this->formatDateTimeImmutableByString($row[2]));
+      if ($row[1] != null) {
+        $audioPhrase = new AudioPhrase();
+        $audioPhrase->setAudioName($row[1]);
+        $audioPhrase->setScore(5);
+        $audioPhrase->setUpdatedAt(new DateTimeImmutable());
+        $audioPhrase->setCreatedAt(new DateTimeImmutable());
+
+        $manager->persist($audioPhrase);
+
+        $phrase->addAudioPhrase($audioPhrase);
+      }
+
 
       /* ********** Setting patients ************ */
       switch ($row[3]) {
         case 1:
-          $sentence->setPatient($this->patRepo->findOneByName("Cyril", "Acacio"));
+          $phrase->setPatient($this->patRepo->findOneByName("Cyril", "Acacio"));
           break;
         case 2:
-          $sentence->setPatient($this->patRepo->findOneByName("Simba", "Rudrauf"));
+          $phrase->setPatient($this->patRepo->findOneByName("Simba", "Rudrauf"));
           break;
         case 14:
-          $sentence->setPatient($this->patRepo->findOneByName('Ziggy', 'V'));
+          $phrase->setPatient($this->patRepo->findOneByName('Ziggy', 'V'));
           break;
         case 15:
-          $sentence->setPatient($this->patRepo->findOneByName('John', 'Doe'));
+          $phrase->setPatient($this->patRepo->findOneByName('John', 'Doe'));
           break;
         case 16:
-          $sentence->setPatient($this->patRepo->findOneByName('Tristan', 'Rudrauf'));
+          $phrase->setPatient($this->patRepo->findOneByName('Tristan', 'Rudrauf'));
           break;
         case 17:
-          $sentence->setPatient($this->patRepo->findOneByName('Emilie', 'Ekon'));
+          $phrase->setPatient($this->patRepo->findOneByName('Emilie', 'Ekon'));
           break;
         case 19:
-          $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
+          $phrase->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 15', 'Patient désactivé numéro 15'));
           break;
         case 20:
-          $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
+          $phrase->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 17', 'Patient désactivé numéro 17'));
           break;
         case 21:
-          $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
+          $phrase->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 20', 'Patient désactivé numéro 20'));
           break;
         case 22:
-          $sentence->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
+          $phrase->setPatient($this->patRepo->findOneByName('Patient désactivé numéro 21', 'Patient désactivé numéro 21'));
           break;
         case 23:
-          $sentence->setPatient($this->patRepo->findOneByName('sa', 'sa'));
+          $phrase->setPatient($this->patRepo->findOneByName('sa', 'sa'));
           break;
         default:
           break;
       }
 
-      // /* ********** Link pictograms to sentence ************ */
-      // $pictos = explode(" ", $row[0]);
-      // foreach ($pictos as $picto) {
-      //     if ($picto != null) {
-      //         $sentence->addPictogram($this->pictRepo->findOneByName($picto));
-      //     }
-      // }
-
-      $manager->persist($sentence);
+      $manager->persist($phrase);
     }
   }
 }

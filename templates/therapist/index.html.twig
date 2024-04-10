@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AdminController!{% endblock %}
+
+{% block body %}
+  <div class="sm:h-screen bg-pbg sm:pt-10">
+    <div class="relative w-full sm:w-5/6 md:w-4/5 lg:w-3/4 xl:w-2/3 h-full sm:h-5/6 md:h-4/5 bg-pform sm:rounded-xl
+      overflow-hidden p-3 ml-auto mr-auto">
+      <!-- titre de l'item choisi -->
+      {% include "therapist/index_header.html.twig" %}
+      <div class="flex flex-col md:flex-row items-start sm:p-4 h-5/6">
+        {% include "therapist/content_list.html.twig" %}
+
+        {% if app.request.getPathInfo == path('therapist_index') %}
+        {% include "therapist/index_section.html.twig" %}
+        {% elseif app.request.getPathInfo == path('therapist_therapists') %}
+        {% include "therapist/therapists_section.html.twig" %}
+        {% elseif app.request.getPathInfo starts with '/therapist/patients' %}
+        {% include "therapist/patients_section.html.twig" %}
+        
+        {% elseif app.request.getPathInfo == path('therapist_categories') %}
+        {% include "therapist/categories_section.html.twig" %}
+        {% elseif app.request.getPathInfo == path('therapist_pictograms') %}
+        {% include "therapist/pictograms_section.html.twig" %}
+        {% elseif app.request.getPathInfo == path('therapist_institutions') %}
+        {% include "therapist/institutions_section.html.twig" %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endblock %}

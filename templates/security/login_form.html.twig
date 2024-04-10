@@ -4,7 +4,7 @@
   {% if app.user %}
   <div class="z-10 mb-3 text-center">
     Vous êtes vous connecté(e) en tant que
-    <a href="{{ path('admin_index') }}"
+    <a href="{{ path('therapist_index') }}"
       class="font-semibold cursor-pointer underline hover:text-pred transition duration-150">{{ app.user.userIdentifier
       }}</a>
     <form action="{{ path('app_logout') }}" method="get">

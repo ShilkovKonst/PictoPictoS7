@@ -1,0 +1,40 @@
+{{ form_start(patientForm, {
+'attr': {
+'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full'
+}
+}) }}
+<div class="w-full grid grid-cols-1 md:grid-cols-2 sm:gap-2 md:gap-4">
+  {{ form_row(patientForm.firstName, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(patientForm.lastName, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(patientForm.grade, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(patientForm.sex, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(patientForm.birthDate, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(patientForm.noteComment, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+</div>
+
+<button type="submit" class="btn-b">S'inscrire</button>
+{{ form_end(patientForm) }}

@@ -1,0 +1,149 @@
+erDiagram   
+    INSTITUTION {
+        int id PK
+        string title
+        string email
+        string telephone
+        string contactName
+        string code 
+        date createdAt
+        date updatedAt
+    }
+    USER {
+        int id PK
+        string firstName
+        string lastName 
+        string email 
+        string password 
+        string telephone
+        string job
+        boolean isActive
+        %% start technical fields
+        %% from Symfony
+        boolean isVerified
+        %% from Spring 
+        string resetPasswordToken 
+        date resetPasswordTokenExpiration 
+        string verificationToken 
+        %% end technical fields
+        string[] roles
+        date createdAt
+        date updatedAt
+        int institutionId FK
+    }    
+    PATIENT {
+        int id PK
+        string firstName
+        string lastName
+        string alias
+        string grade 
+        string sex
+        string summary
+        date birthDate
+        date createdAt
+        date updatedAt
+        int therapistId FK
+    }
+    NOTE {
+        int id PK
+        string estimation
+        string comment
+        date createdAt
+        date updatedAt
+        int patientId FK
+        int therapistId FK
+    }   
+    CATEGORY {
+        int id PK
+        string title
+        string filename
+        date createdAt
+        date updatedAt
+        int superCategory FK
+    }
+    CATEGORY_QUESTION {
+        int categoryId PK, FK
+        int questionId PK, FK
+    }
+    QUESTION {
+        int id PK
+        string text
+        date createdAt
+        date updatedAt
+    }
+    PHRASE {
+        int id PK
+        string text
+        date createdAt
+        date updatedAt
+        int patientId FK
+        int questionId FK
+    }
+    AUDIO_PHRASE {
+        int id PK
+        string audio
+        int score
+        date createdAt
+        date updatedAt
+        int phraseId FK
+    }
+    PHRASE_PICTOGRAM {
+        int phraseId PK, FK
+        int pictogramId PK, FK
+    }
+    PICTOGRAM {
+        int id PK
+        string title
+        string filename
+        date createdAt
+        date updatedAt
+        int userId FK
+        int categoryId FK
+        int irregularId FK
+    }
+    TAG {
+        int id PK
+        string title
+    }
+    IRREGULAR {
+        int id PK
+        string feminin
+        string participePasse
+        string pluriel
+    }
+    CONJUGATION {
+        int id PK
+        string temps
+        string premierePersSing
+        string premierePersPlur
+        string deuxiemePersSing
+        string deuxiemePersPlur
+        string troisiemePersSing
+        string troisiemePersPlur
+        int irregulierId FK
+    }
+    PICTOGRAM_TAG {
+        int pictogramId PK, FK
+        int tagId PK, FK
+    }
+    
+    INSTITUTION ||--o{ USER : has    
+    USER ||--o{ PATIENT : follows
+    USER ||--o{ NOTE : creates
+    NOTE }o--|| PATIENT : concerns
+    CATEGORY ||--o{ CATEGORY : is_parent_of
+    QUESTION ||--o{ CATEGORY_QUESTION : concerns
+    CATEGORY ||--o{ CATEGORY_QUESTION : concerns
+    PATIENT ||--o{ PHRASE : constructs
+    %% PHRASE }o--o{ PICTOGRAM : consists_of
+    PHRASE ||--o{ PHRASE_PICTOGRAM: consist_of
+    PHRASE_PICTOGRAM }o--|| PICTOGRAM :consist_of
+    PHRASE ||--o{ AUDIO_PHRASE : has
+    QUESTION |o--o{ PHRASE : concerns
+    USER ||--o{ PICTOGRAM : creates
+    CATEGORY ||--o{ PICTOGRAM : consists_of
+    PICTOGRAM ||--o| IRREGULAR : can_be
+    %% PICTOGRAM }o--o{ TAG : can_have
+    PICTOGRAM ||--o{ PICTOGRAM_TAG : can_have
+    PICTOGRAM_TAG }o--|| TAG : can_have
+    IRREGULAR ||--o{ CONJUGATION : has

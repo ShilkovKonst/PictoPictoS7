@@ -2,51 +2,62 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\UpdatedAtTrait;
 use App\Repository\PatientRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[ORM\Entity(repositoryClass: PatientRepository::class)]
 class Patient
 {
+    use CreatedAtTrait;
+    use UpdatedAtTrait;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id;
 
-    #[ORM\Column(length: 100)]
-    private ?string $firstName;
+    #[ORM\Column(length: 255)]
+    private ?string $firstName = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $lastName;
+    #[ORM\Column(length: 255)]
+    private ?string $lastName = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $birthDate;
+    #[ORM\Column(length: 255)]
+    private ?string $grade = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $schoolGrade;
+    #[ORM\Column(length: 10)]
+    private ?string $sex = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $birthDate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'patients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $therapist = null;
 
     #[ORM\OneToMany(targetEntity: Note::class, mappedBy: 'patient')]
     private Collection $notes;
 
+    #[ORM\OneToMany(targetEntity: Phrase::class, mappedBy: 'patient')]
+    private Collection $phrases;
+
     #[ORM\Column]
-    private array $roles = [];
+    private ?bool $isActive = null;
 
-    #[ORM\OneToMany(targetEntity: Sentence::class, mappedBy: 'patient')]
-    private Collection $sentences;
-
-    #[ORM\Column(length: 255)]
-    private ?string $sex = null;
-
-    #[ORM\ManyToOne(inversedBy: 'patients')]
-    private ?Therapist $therapist = null;
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $code = null;
 
     public function __construct()
     {
         $this->notes = new ArrayCollection();
-        $this->sentences = new ArrayCollection();
+        $this->phrases = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -54,19 +65,12 @@ class Patient
         return $this->id;
     }
 
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
     public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): self
+    public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
 
@@ -78,105 +82,21 @@ class Patient
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): self
+    public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
 
         return $this;
     }
 
-    public function getBirthDate(): ?\DateTimeInterface
+    public function getGrade(): ?string
     {
-        return $this->birthDate;
+        return $this->grade;
     }
 
-    public function setBirthDate(\DateTimeInterface $birthDate): self
+    public function setGrade(string $grade): static
     {
-        $this->birthDate = $birthDate;
-
-        return $this;
-    }
-
-    public function getSchoolGrade(): ?string
-    {
-        return $this->schoolGrade;
-    }
-
-    public function setSchoolGrade(string $schoolGrade): self
-    {
-        $this->schoolGrade = $schoolGrade;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Note>
-     */
-    public function getNotes(): Collection
-    {
-        return $this->notes;
-    }
-
-    public function addNote(Note $note): self
-    {
-        if (!$this->notes->contains($note)) {
-            $this->notes->add($note);
-            $note->setPatient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNote(Note $note): self
-    {
-        if ($this->notes->removeElement($note)) {
-            // set the owning side to null (unless already changed)
-            if ($note->getPatient() === $this) {
-                $note->setPatient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Sentence>
-     */
-    public function getSentences(): Collection
-    {
-        return $this->sentences;
-    }
-
-    public function addSentence(Sentence $sentence):self
-    {
-        if (!$this->sentences->contains($sentence)) {
-            $this->sentences->add($sentence);
-            $sentence->setPatient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSentence(Sentence $sentence):self
-    {
-        if ($this->sentences->removeElement($sentence)) {
-            // set the owning side to null (unless already changed)
-            if ($sentence->getPatient() === $this) {
-                $sentence->setPatient(null);
-            }
-        }
+        $this->grade = $grade;
 
         return $this;
     }
@@ -193,14 +113,110 @@ class Patient
         return $this;
     }
 
-    public function getTherapist(): ?Therapist
+    public function getBirthDate(): ?\DateTimeImmutable
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(\DateTimeImmutable $birthDate): static
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
+    }
+
+    public function getTherapist(): ?User
     {
         return $this->therapist;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function setTherapist(?User $therapist): static
     {
         $this->therapist = $therapist;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): static
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes->add($note);
+            $note->setPatient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): static
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getPatient() === $this) {
+                $note->setPatient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Phrase>
+     */
+    public function getPhrases(): Collection
+    {
+        return $this->phrases;
+    }
+
+    public function addPhrase(Phrase $phrase): static
+    {
+        if (!$this->phrases->contains($phrase)) {
+            $this->phrases->add($phrase);
+            $phrase->setPatient($this);
+        }
+
+        return $this;
+    }
+
+    public function removePhrase(Phrase $phrase): static
+    {
+        if ($this->phrases->removeElement($phrase)) {
+            // set the owning side to null (unless already changed)
+            if ($phrase->getPatient() === $this) {
+                $phrase->setPatient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode($code): static
+    {
+        $this->code = strtolower($code);
 
         return $this;
     }

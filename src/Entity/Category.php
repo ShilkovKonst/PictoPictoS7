@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\IllustrationFilenameTrait;
-use App\Entity\Trait\NameTrait;
+use App\Entity\Trait\TitleTrait;
 use App\Entity\Trait\UpdatedAtTrait;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,8 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
 {
-    use NameTrait;
+    use TitleTrait;
     use IllustrationFilenameTrait;
+    use CreatedAtTrait;
     use UpdatedAtTrait;
 
     #[ORM\Id]
@@ -32,29 +34,19 @@ class Category
     #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'categories')]
     private Collection $questions;
 
-    #[ORM\ManyToOne(inversedBy: 'categories')]
-    private ?Therapist $therapist = null;
-
-    // #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
-    // private Collection $pictograms;
+    #[ORM\OneToMany(targetEntity: Pictogram::class, mappedBy: 'category')]
+    private Collection $pictograms;
 
     public function __construct()
     {
         $this->subCategories = new ArrayCollection();
         $this->questions = new ArrayCollection();
-        // $this->pictograms = new ArrayCollection();
+        $this->pictograms = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getSuperCategory(): ?self
@@ -123,45 +115,33 @@ class Category
         return $this;
     }
 
-    public function getTherapist(): ?Therapist
+    /**
+     * @return Collection<int, Pictogram>
+     */
+    public function getPictograms(): Collection
     {
-        return $this->therapist;
+        return $this->pictograms;
     }
 
-    public function setTherapist(?Therapist $therapist): static
+    public function addPictogram(Pictogram $pictogram): static
     {
-        $this->therapist = $therapist;
+        if (!$this->pictograms->contains($pictogram)) {
+            $this->pictograms->add($pictogram);
+            $pictogram->setCategory($this);
+        }
 
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Pictogram>
-    //  */
-    // public function getPictograms(): Collection
-    // {
-    //     return $this->pictograms;
-    // }
+    public function removePictogram(Pictogram $pictogram): static
+    {
+        if ($this->pictograms->removeElement($pictogram)) {
+            // set the owning side to null (unless already changed)
+            if ($pictogram->getCategory() === $this) {
+                $pictogram->setCategory(null);
+            }
+        }
 
-    // public function addPictogram(Pictogram $pictogram): static
-    // {
-    //     if (!$this->pictograms->contains($pictogram)) {
-    //         $this->pictograms->add($pictogram);
-    //         $pictogram->setCategory($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removePictogram(Pictogram $pictogram): static
-    // {
-    //     if ($this->pictograms->removeElement($pictogram)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($pictogram->getCategory() === $this) {
-    //             $pictogram->setCategory(null);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
+        return $this;
+    }
 }

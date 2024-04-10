@@ -42,6 +42,11 @@
         'class': 'input-text z-10',
         }
         }) }}
+        {{ form_row(registrationForm.phoneNumber, {
+        'attr': {
+        'class': 'input-text z-10',
+        }
+        }) }}
         {{ form_row(registrationForm.job, {
         'attr': {
         'class': 'input-text z-10',
@@ -52,12 +57,12 @@
         'class': 'input-text z-10',
         }
         }) }}
-        {{ form_row(registrationForm.institution, {
+        {{ form_row(registrationForm.plainPassword.first, {
         'attr': {
         'class': 'input-text z-10',
         }
         }) }}
-        {{ form_row(registrationForm.plainPassword.first, {
+        {{ form_row(registrationForm.institution, {
         'attr': {
         'class': 'input-text z-10',
         }
@@ -67,11 +72,6 @@
         'class': 'input-text z-10',
         }
         }) }}
-        {# {{ form_row(registrationForm.checkPassword, {
-        'attr': {
-        'class': 'input-text',
-        }
-        }) }} #}
       </div>
       {# <div class="flex items-center h-5 mt-2 mr-auto">
         {{ form_row(registrationForm.agreeTerms) }}
