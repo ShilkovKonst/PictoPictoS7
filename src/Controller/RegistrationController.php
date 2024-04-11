@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Therapist;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\InstitutionRepository;
@@ -13,7 +12,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

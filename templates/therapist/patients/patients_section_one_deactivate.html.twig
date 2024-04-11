@@ -1,7 +1,7 @@
 <div class="">
   <p class="text-lg text-center font-bold p-2 border-b">
     <span class="font-normal">Desactivation du dossier</span>
-    {{ patient.code }}
+    {{ code }}
   </p>
   <div>
     <p class=" text-base tracking-[0.25px] leading-relaxed m-1">
@@ -17,10 +17,18 @@
       désactivé sera possible.
     </p>
   </div>
-  <form>
-    <label for="mdp">Verifier votre mot de passe</label>
-    <input id="mdp" name="password" type="password">
-    <button type="submit">Desactiver</button>
-  </form>
 </div>
-<div></div>
+
+{{ form_start(passwordForm, {
+'attr': {
+'class': 'flex flex-col md:gap-3 justify-center items-center w-full p-2'
+}
+}) }}
+{{ form_row(passwordForm.password, {
+'attr': {
+'class': 'input-text z-10',
+}
+}) }}
+
+<button type="submit" class="btn-b mb-6">Désactiver</button>
+{{ form_end(passwordForm) }}

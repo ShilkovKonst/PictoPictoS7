@@ -1,4 +1,16 @@
-<table class="table w-full">
+<table class="table w-full"> <thead>
+  <tr class="  border-b">
+    <th class="text-lg p-2"><span class="font-normal">Profil</span></th>
+    <td>
+      {% if app.user.isActive %}
+      {% include "therapist/_actions_footer.html.twig" with {
+      path1: 'therapist_profile_update',
+      path2: 'therapist_profile_desactivate',
+      } %}
+      {% endif %}
+    </td>
+  </tr>
+</thead>
     <tbody class="flex flex-col gap-2">
       <tr class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
         <th class="text-start w-[40%] lg:w-[20%]">Nom</th>
@@ -59,7 +71,3 @@
       </tr>
     </tbody>
   </table>
-  {% include "therapist/_actions_footer.html.twig" with {
-  path1: 'therapist_profile_update',
-  path2: 'therapist_profile_desactivate',
-  } %}

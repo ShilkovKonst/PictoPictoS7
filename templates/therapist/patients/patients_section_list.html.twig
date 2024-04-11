@@ -1,6 +1,10 @@
 <table class="table w-full relative">
   <tbody class="flex flex-col gap-1">
-    {% include "/therapist/_table_header.html.twig" with {path: 'therapist_patients_create_one', entity: 'dossier'} %}
+    {% include "/therapist/_table_header.html.twig" with {
+      path: 'therapist_patients_create_one', 
+      entity: 'dossier',
+      col1: 'Nom',
+      col2: 'Date de naissance'} %}
     {% for patient in patients %}
     <tr class="flex flex-row justify-start items-center text-sm sm:text-base border-b pb-1">
       <td class="text-center md:text-start w-1/3">
@@ -10,15 +14,27 @@
       </td>
       <td class="text-center md:text-start w-1/3">{{ patient.birthDate|date("Y-m-d") }}</td>
       <td class="text-center md:text-start w-1/3">
+        {% if patient.isActive %}
         {% include "/therapist/_actions_table.html.twig" with {
         path1: 'therapist_patients_update_one',
-        path2: 'therapist_patients_desactivate_one',
+        path2: 'therapist_patients_deactivate_one',
         code: patient.code,
         entity: 'dossier'
         } %}
+        {% else %}
+        <div class="flex justify-center items-center gap-1">
+          Dossier inactif
+          <svg class="cursor-pointer w-6 h-6 text-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
+              clip-rule="evenodd" />
+          </svg>
+        </div>          
+        {% endif %}       
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-{% include "/therapist/_pagination.html.twig" with {path: 'therapist_patients'} %}
+{% include "/therapist/_pagination.html.twig" with {path: 'therapist_patients_get_all'} %}

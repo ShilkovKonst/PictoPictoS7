@@ -1,17 +1,16 @@
 <tr class="flex flex-row justify-start items-center text-sm sm:text-base py-4 border-b">
-    <th class="text-center md:text-start w-1/3">Nom</th>
-    <th class="text-center md:text-start w-1/3">Date de naissance</th>
-    <th class="relative w-1/3 bg-pbg hover:bg-pred transition duration-150 ease-in-out rounded-xl group">
-      <a href="{{ path( path ) }}" class="w-full flex justify-center items-center">
-        <svg class="w-6 h-6 text-white" aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
-      </a>
-      <div
-          class="hidden group-hover:block absolute bottom-[100%] right-0 rounded-lg py-1 px-1 cursor-default">
-          <p class="text-xs">Créer un nouveau {{ entity }}</p>
-      </div>
-    </th>
-  </tr>
+  <th class="text-center md:text-start w-1/3">{{ col1 }}</th>
+  <th class="text-center md:text-start w-1/3">{{ col2 }}</th>
+  <th class="relative w-1/3 bg-pbg hover:bg-pred transition duration-150 ease-in-out rounded-xl group">
+    <a href="{{  entity != 'note' ? path( path ) : path( path, { code: code } )  }}" class="w-full flex justify-center items-center">
+      <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    </a>
+    <div class="hidden group-hover:block absolute bottom-[100%] right-0 rounded-lg py-1 px-1 cursor-default">
+      <p class="text-xs">{{ entity == 'note' ? 'Créer une nouvelle ' : 'Créer un nouveau ' }}{{ entity }}</p>
+    </div>
+  </th>
+</tr>

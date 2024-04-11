@@ -5,6 +5,8 @@ namespace App\Controller\Therapist;
 use App\Entity\Note;
 use App\Entity\Patient;
 use App\Entity\User;
+use App\Form\NoteFormType;
+use App\Form\PasswordFormType;
 use App\Form\PatientFormType;
 use App\Repository\CategoryRepository;
 use App\Repository\InstitutionRepository;
@@ -15,8 +17,10 @@ use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -99,8 +103,8 @@ class PatientController extends AbstractController
             $note->setEstimation('initial');
             $noteComment = $form->get('noteComment')->getData();
             if ($noteComment == NULL || $noteComment == '') {
-                $noteComment = 'Initialisation du dossier de ' . $sex == 'homme' ? 'Mr ' : 'Mme ' . $firstName . ' ' . $lastName;
-            } 
+                $noteComment = 'Initialisation du dossier de ' . $firstName . ' ' . $lastName;
+            }
             $note->setComment($noteComment);
             $note->setTherapist($user);
             $note->setCreatedAt(new DateTimeImmutable());
@@ -130,16 +134,20 @@ class PatientController extends AbstractController
     }
 
     #[Route('/{code}', name: "therapist_patients_get_one")]
-    public function getPatientById($code, Request $request): Response
+    public function getPatientByCode($code): Response
     {
         /** @var User $user */
         $user = $this->getUser();
-        // dd($request->getPathInfo());
+
+        /** @var Patient $patient */        
         $patient = $this->patRepo->findOneByCode($code);
-        // dd($patient);
+
+        $notes = $patient->getNotes();
 
         return $this->render('therapist/index.html.twig', [
-            'patient' => $patient
+            'code' => $code,
+            'patient' => $patient,
+            'notes' => $notes
         ]);
     }
 
@@ -148,8 +156,16 @@ class PatientController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-
+        /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
+
+        if (!$patient->isIsActive()) {  
+            $this->addFlash('danger', 'Dossier ' . $code . ' est inactif! Il est interdit changer les données du patient!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+        }
 
         $form = $this->createForm(PatientFormType::class, $patient);
         $form->handleRequest($request);
@@ -187,20 +203,106 @@ class PatientController extends AbstractController
 
         return $this->render('therapist/index.html.twig', [
             'patientForm' => $form,
+            'code' => $code,
             'patient' => $patient
         ]);
     }
 
-    #[Route('/{code}/delete', name: "therapist_patients_desactivate_one")]
-    public function desactivatePatientByCode($code, Request $request): Response
+    #[Route('/{code}/deactivate', name: "therapist_patients_deactivate_one")]
+    public function desactivatePatientByCode($code, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         /** @var User $user */
         $user = $this->getUser();
-
+        /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
+        if (!$patient->isIsActive()) {  
+            $this->addFlash('danger', 'Dossier ' . $code . ' est déjà inactif!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+        }
+
+        $form = $this->createForm(PasswordFormType::class);
+        $form->handleRequest($request);
+
+        // creating new error if written institution code doesnt match with the code of the chosen institution 
+        if ($form->isSubmitted() && !$userPasswordHasher->isPasswordValid($user, $form->get('password')->getData())) {
+            $form->addError(new FormError('Mot de passe est incorrect!'));
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $patient->setIsActive(false);
+
+            $entityManager->persist($patient);
+            $entityManager->flush();
+
+            $this->addFlash('warning', 'Dossier ' . $code . ' dèsactivé!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+
+        } else if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Mot de passe est incorrect!');
+        }
+
         return $this->render('therapist/index.html.twig', [
-            'patient' => $patient
+            'code' => $code,
+            'passwordForm' => $form,
+
+        ]);
+    }
+
+    #[Route('/{code}/note/create', name: "therapist_patients_note_create")]
+    public function createNoteByPatient($code, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        /** @var Patient $patient */
+        $patient = $this->patRepo->findOneByCode($code);
+
+        if (!$patient->isIsActive()) {  
+            $this->addFlash('danger', 'Dossier ' . $code . ' est inactif!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+        }
+        
+        $note = new Note();
+
+        $form = $this->createForm(NoteFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $note->setEstimation($form->get('estimation')->getData());
+            $note->setComment($form->get('comment')->getData());
+
+            $note->setCreatedAt(new DateTimeImmutable());
+            $note->setUpdatedAt(new DateTimeImmutable());
+
+            $note->setTherapist($user);
+            $note->setPatient($patient);
+
+            $entityManager->persist($note);
+            $entityManager->flush();
+
+            $this->addFlash('sucess', 'Nouvelle note du dossier' . $code . ' est créé!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+
+        } else if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Somùething went wrong');
+        }
+
+        return $this->render('therapist/index.html.twig', [
+            'code' => $code,
+            'noteForm' => $form,
+
         ]);
     }
 }
