@@ -1,0 +1,30 @@
+<table class="table w-full">
+  <thead>
+    <tr class="  border-b">
+      <th class="text-lg flex justify-center items-center">
+        <span class=" mx-auto">
+          Note de {{ note.createdAt|date('d/m/Y h:m') }} <br>
+          de dossier
+          <a class="hover:text-pred trasition duration-150 ease-in-out"
+            href="{{ path( 'therapist_patients_get_one', { code: code } ) }}">{{ code }}</a>
+        </span>
+      </th>
+    </tr>
+  </thead>
+  <tbody class="flex flex-col gap-2">
+    <tr
+      class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+      <th class="text-start w-[40%] lg:w-[20%]">Estimation</th>
+      <td class="text-center w-[45%] lg:w-[30%]">
+        <div
+          class="w-full h-full rounded-md border mx-2 md:mx-0 md:mr-4 {{ note.estimation == 'initial' ? 'bg-blue-400 border-blue-800' : note.estimation == 'stable' ?  'bg-yellow-400 border-yellow-800' : note.estimation == 'progress' ? 'bg-green-400 border-green-800' : 'bg-red-400 border-red-800' }}">
+          {{ note.estimation }}
+      </td>
+    </tr>
+    <tr
+      class="flex flex-col flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+      <th class="text-start w-full">Commentaire</th>
+      <td class="text-start w-full">{{ note.comment }}</td>
+    </tr>
+  </tbody>
+</table>

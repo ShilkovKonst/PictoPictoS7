@@ -1,0 +1,43 @@
+<table class="table w-full relative">
+  <tbody class="flex flex-col gap-1">
+    {% if app.user.isActive %}
+    {% include "/therapist/_table_header.html.twig" with {
+      path: 'therapist_pictograms_create_one', 
+      entity: 'pictogramme',
+      col1: 'Image',
+      col2: 'Titre'} %}
+    {% endif %}  
+    {% for pictogram in pictograms %}
+    <tr class="flex flex-row justify-start items-center text-sm sm:text-base border-b pb-1">
+      <td class="text-center md:text-start w-1/3">
+        <a href="{{ path( 'therapist_pictograms_get_one' , { code: pictogram.id }) }}">
+          <img class="h-10 w-10 md:h-14 md:w-14" src="{{ asset('img/picto/' ~ pictogram.filename) }}"
+            alt="{{ pictogram.filename }}">
+        </a>
+      </td>
+      <td class="text-center md:text-start w-1/3">{{ pictogram.title }}</td>
+      <td class="text-center md:text-start w-1/3">
+        {% if app.user.isActive %}
+        {% include "/therapist/_actions_table.html.twig" with {
+        path1: 'therapist_pictograms_update_one',
+        path2: 'therapist_pictograms_deactivate_one',
+        code: pictogram.id,
+        entity: 'pictogramme'
+        } %}
+        {% elseif app.user.isActive is same as(false)  %}
+        <div class="flex justify-center items-center gap-1">
+          Profil inactif
+          <svg class="cursor-pointer w-6 h-6 text-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
+              clip-rule="evenodd" />
+          </svg>
+        </div>          
+        {% endif %}       
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include "/therapist/_pagination.html.twig" with {path: 'therapist_pictograms_get_all'} %}

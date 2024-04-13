@@ -16,4 +16,7 @@
 {% elseif app.request.getPathInfo == path('therapist_patients_note_create', {code: code}) %}
 {% include "therapist/patients/patients_note_create.html.twig" %}
 
+{% elseif app.request.getPathInfo == path('therapist_patients_note_get_one', {code: code, noteId: noteId}) %}
+{% include "therapist/patients/patients_note_show.html.twig" %}
+
 {% endif %}

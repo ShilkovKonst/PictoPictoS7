@@ -14,7 +14,7 @@ trait IllustrationFilenameTrait
     #[ORM\Column(length: 255)]
     private ?string $filename = null;
 
-    #[Assert\Image(mimeTypes: ["image/png"])]
+    #[Assert\Image(mimeTypes: ["image/png", "image/gif"])]
     #[Vich\UploadableField(mapping: "category_image", fileNameProperty: "filename")]
     private ?File $illustration = null;    
 
@@ -39,7 +39,7 @@ trait IllustrationFilenameTrait
     {
         $this->illustration = $illustration;
         if ($this->illustration instanceof UploadedFile) {
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new \DateTimeImmutable('now');
         }
 
         return $this;

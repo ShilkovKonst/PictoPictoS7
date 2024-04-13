@@ -25,9 +25,7 @@ class UserController extends AbstractController
     public function __construct(
         private UserRepository $uRepo,
         private InstitutionRepository $iRepo,
-        private PatientRepository $patRepo,
         private CategoryRepository $catRepo,
-        private PictogramRepository $pictRepo
     ) {
     }
 
@@ -173,32 +171,6 @@ class UserController extends AbstractController
 
         return $this->render('therapist/index.html.twig', [
             'categories' => $categories,
-            'page' => $page,
-            'maxPages' => $maxPages,
-            'step' => $step,
-            'count' => $count,
-            'sortBy' => $sortBy,
-            'sortDir' => $sortDir
-        ]);
-    }
-
-    #[Route('/pictograms', name: "therapist_pictograms")]
-    public function getAllPictograms(Request $request): Response
-    {
-        $sortBy = $request->query->getString('sortBy', 'id');
-        $sortDir = $request->query->getString('sortDir', 'ASC');
-        $page = $request->query->getInt('page', 1);
-        $limit = 5;
-        $step = 5;
-        /** @var ArrayCollection $pictograms */
-        $pictograms = $this->pictRepo->findAllWithPaginator($limit, $page, $sortBy, $sortDir);
-        $count = $pictograms->count();
-        $maxPages = ceil($count / $limit);
-        if ($page < 1) $page = 1;
-        if ($page > $maxPages) $page = $maxPages;
-
-        return $this->render('therapist/index.html.twig', [
-            'pictograms' => $pictograms,
             'page' => $page,
             'maxPages' => $maxPages,
             'step' => $step,

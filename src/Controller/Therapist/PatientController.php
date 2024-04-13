@@ -299,4 +299,31 @@ class PatientController extends AbstractController
 
         ]);
     }
+
+    #[Route('/{code}/note/{noteId}', name: "therapist_patients_note_get_one")]
+    public function getNoteByPatient($code, $noteId, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        /** @var Patient $patient */
+        $patient = $this->patRepo->findOneByCode($code);
+
+        if (!$patient->isIsActive()) {  
+            $this->addFlash('danger', 'Dossier ' . $code . ' est inactif!');
+
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code
+            ]);
+        }
+        
+        $note = $this->noteRepo->findOneById($noteId);
+
+
+        return $this->render('therapist/index.html.twig', [
+            'code' => $code,
+            'noteId' => $noteId,
+            'note' => $note
+
+        ]);
+    }
 }

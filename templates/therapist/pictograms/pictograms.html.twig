@@ -1,0 +1,22 @@
+{% if app.request.getPathInfo == path('therapist_pictograms_get_all') %}
+{% include "therapist/pictograms/pictograms_list.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_pictograms_create_one') %}
+{% include "therapist/pictograms/pictograms_form.html.twig" %}
+{# 
+{% elseif app.request.getPathInfo == path('therapist_pictograms_get_one', {code: code}) %}
+{% include "therapist/pictograms/pictograms_one.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_pictograms_update_one', {code: code}) %}
+{% include "therapist/pictograms/pictograms_one_update.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_pictograms_deactivate_one', {code: code}) %}
+{% include "therapist/pictograms/pictograms_one_deactivate.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_pictograms_note_create', {code: code}) %}
+{% include "therapist/pictograms/pictograms_note_create.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_pictograms_note_get_one', {code: code, noteId: noteId}) %}
+{% include "therapist/pictograms/pictograms_note_show.html.twig" %} #}
+
+{% endif %}

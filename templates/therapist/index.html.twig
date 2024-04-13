@@ -33,8 +33,8 @@ Lis of {{ app.user.email }} patients
         {% elseif app.request.getPathInfo == path('therapist_categories') %}
         {% include "therapist/categories.html.twig" %}
 
-        {% elseif app.request.getPathInfo == path('therapist_pictograms') %}
-        {% include "therapist/pictograms.html.twig" %}
+        {% elseif app.request.getPathInfo starts with '/therapist/pictograms' %}
+        {% include "therapist/pictograms/pictograms.html.twig" %}
 
         {% elseif app.request.getPathInfo == path('therapist_institutions') %}
         {% include "therapist/institutions.html.twig" %}
