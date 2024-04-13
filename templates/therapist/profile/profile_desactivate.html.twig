@@ -1,0 +1,44 @@
+
+<div class="flex flex-col items-center justify-between">
+  <p class="text-lg text-center font-bold p-2 border-b">
+    <span class="font-normal">Desactivation du profil </span>
+    <a class="hover:text-pred trasition duration-150 ease-in-out" href="{{ path( 'therapist_profile_show' ) }}">
+      {{ app.user.email }}
+    </a>
+  </p>
+  <dl class="text-sm md:text-base tracking-[0.25px] leading-relaxed mb-10">
+    <dt class="my-1">
+      Après la désactivation de votre profil, vous ne pourrez plus :
+    </dt>
+    <dd>
+      <span class="font-bold">gérer les données</span> du profil
+    </dd>
+    <dd>
+      <span class="font-bold">gérer les données</span> des patients
+    </dd>
+    <dd>
+      <span class="font-bold">prendre des notes</span> sur l'état des patients
+    </dd>
+    <dd>
+      <span class="font-bold">créer des sessions</span> de jeu pour les patients
+    </dd>
+    <dt class="my-1">
+      Toutes les fonctionnalités seront bloquées, seule la visualisation des données initiales de l'utilisateur
+      désactivé sera possible.
+    </dt>
+  </dl>
+
+</div>
+{{ form_start(passwordForm, {
+'attr': {
+'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full p-2'
+}
+}) }}
+  {{ form_row(passwordForm.password, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+
+<button type="submit" class="btn-b mb-6">Désactiver</button>
+{{ form_end(passwordForm) }}

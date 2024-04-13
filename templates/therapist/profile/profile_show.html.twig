@@ -1,17 +1,17 @@
 <table class="table w-full"> <thead>
-  <tr class="  border-b">
-    <th class="text-lg p-2"><span class="font-normal">Profil</span></th>
-    <td>
+  <tr class=" border-b w-auto">
+    <th class="text-lg  flex justify-center items-center"><span class="font-bold mx-auto">
+    {{ app.user.isActive ? 'Profil' : '[inactif] Profil' }}  
+    </span>
       {% if app.user.isActive %}
-      {% include "therapist/_actions_footer.html.twig" with {
+      {% include "therapist/_actions_header.html.twig" with {
       path1: 'therapist_profile_update',
       path2: 'therapist_profile_desactivate',
       } %}
-      {% endif %}
-    </td>
+      {% endif %}</th>
   </tr>
 </thead>
-    <tbody class="flex flex-col gap-2">
+    <tbody class="flex flex-col gap-2 w-full">
       <tr class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
         <th class="text-start w-[40%] lg:w-[20%]">Nom</th>
         <td class="text-start w-[45%] lg:w-[30%]">{{ app.user.lastName}}</td>

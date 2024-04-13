@@ -1,0 +1,19 @@
+{% if app.request.getPathInfo == path('therapist_patients_get_all') %}
+{% include "therapist/patients/patients_list.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_patients_create_one') %}
+{% include "therapist/patients/patients_form.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_patients_get_one', {code: code}) %}
+{% include "therapist/patients/patients_one.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_patients_update_one', {code: code}) %}
+{% include "therapist/patients/patients_one_update.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_patients_deactivate_one', {code: code}) %}
+{% include "therapist/patients/patients_one_deactivate.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_patients_note_create', {code: code}) %}
+{% include "therapist/patients/patients_note_create.html.twig" %}
+
+{% endif %}

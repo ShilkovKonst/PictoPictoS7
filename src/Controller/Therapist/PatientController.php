@@ -8,11 +8,8 @@ use App\Entity\User;
 use App\Form\NoteFormType;
 use App\Form\PasswordFormType;
 use App\Form\PatientFormType;
-use App\Repository\CategoryRepository;
-use App\Repository\InstitutionRepository;
 use App\Repository\NoteRepository;
 use App\Repository\PatientRepository;
-use App\Repository\PictogramRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,10 +27,7 @@ class PatientController extends AbstractController
     public function __construct(
         private UserRepository $userRepo,
         private NoteRepository $noteRepo,
-        private InstitutionRepository $instRepo,
         private PatientRepository $patRepo,
-        private CategoryRepository $catRepo,
-        private PictogramRepository $pictRepo
     ) {
     }
 
@@ -51,7 +45,7 @@ class PatientController extends AbstractController
 
         /** @var ArrayCollection $patients */
         $patients = $this->patRepo->findByTherapistWithPaginator($user->getId(), $limit, $page, $sortBy, $sortDir);
-        $count = $patients->count();
+        $count = $patients->count() != 0 ? $patients->count() : 1;
         $maxPages = ceil($count / $limit);
         if ($page < 1) $page = 1;
         if ($page > $maxPages) $page = $maxPages;
@@ -234,6 +228,7 @@ class PatientController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $patient->setIsActive(false);
+            $patient->setUpdatedAt(new DateTimeImmutable());
 
             $entityManager->persist($patient);
             $entityManager->flush();
@@ -251,7 +246,6 @@ class PatientController extends AbstractController
         return $this->render('therapist/index.html.twig', [
             'code' => $code,
             'passwordForm' => $form,
-
         ]);
     }
 

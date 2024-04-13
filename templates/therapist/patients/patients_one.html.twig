@@ -1,16 +1,20 @@
 <table class="table w-full">
   <thead>
     <tr class="  border-b">
-      <th class="text-lg p-2"><span class="font-normal">Dossier</span> {{ code }}</th>
-      <td>
+      <th class="text-lg flex justify-center items-center">
+        <span class=" mx-auto">
+          Dossier
+          <a class="hover:text-pred trasition duration-150 ease-in-out"
+            href="{{ path( 'therapist_patients_get_one', { code: code } ) }}">{{ code }}</a>
+        </span>
         {% if patient.isActive %}
-        {% include "therapist/_actions_footer.html.twig" with {
+        {% include "therapist/_actions_header.html.twig" with {
         path1: 'therapist_patients_update_one',
         path2: 'therapist_patients_deactivate_one',
         code: patient.code
         } %}
         {% endif %}
-      </td>
+      </th>
     </tr>
   </thead>
   <tbody class="flex flex-col gap-2">

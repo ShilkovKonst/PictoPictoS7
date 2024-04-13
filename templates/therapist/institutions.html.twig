@@ -1,0 +1,19 @@
+<table class="table w-full relative">
+  <tbody class="flex flex-col gap-1">
+    <tr class="absolute -top-3 left-0">
+      <td>{{ count }} therapists au total</td>
+    </tr>
+    <tr class="flex flex-row justify-start items-center text-sm sm:text-base py-4 border-b">
+      <th class="text-center md:text-start w-1/3">Nom</th>
+      <th class="text-center md:text-start w-1/3">Fonction</th>
+      <th class="text-center md:text-start w-1/3">Actions</th>
+    </tr>
+    {% for institution in institutions %}
+    <tr class="flex flex-row justify-start items-center text-sm sm:text-base border-b pb-1">
+      <td class="text-center md:text-start w-1/3">{{ institution.title }}</th>
+      <td class="text-center md:text-start w-1/3">{{ institution.code}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include "/therapist/_pagination.html.twig" with {path: 'therapist_institutions'} %}

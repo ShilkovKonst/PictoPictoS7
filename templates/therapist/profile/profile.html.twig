@@ -1,0 +1,10 @@
+{% if app.request.getPathInfo == path('therapist_profile_show') %}
+{% include "therapist/profile/profile_show.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_profile_update') %}
+{% include "therapist/profile/profile_update.html.twig" %}
+
+{% elseif app.request.getPathInfo == path('therapist_profile_desactivate') %}
+{% include "therapist/profile/profile_desactivate.html.twig" %}
+
+{% endif %}

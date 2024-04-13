@@ -1,4 +1,8 @@
-<div class="text-lg text-center font-bold p-2 border-b"><span class="font-normal">Dossier</span> {{ patient.code }}</div>
+<div class="text-lg text-center font-bold p-2 border-b ">
+  <a class="hover:text-pred trasition duration-150 ease-in-out" href="{{ path( 'therapist_patients_get_one', { code: code } ) }}">
+    {{ code }}
+  </a>
+</div>
 
 {{ form_start(patientForm, {
 'attr': {
