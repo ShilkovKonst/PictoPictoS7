@@ -3,14 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Category;
-use App\Entity\Conjugation;
-use App\Entity\Irregular;
-use App\Entity\Phrase;
 use App\Entity\Pictogram;
-use App\Entity\Tag;
 use App\Repository\PictogramRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -31,10 +28,16 @@ class PictogramFormType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre du pictogramme*:',
+                'row_attr' => [
+                    'class' => 'border-b', 
+                ],
+                'label' => 'Titre du nouveau pictogramme',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Titre du pictogramme'
+                    'placeholder' => 'Titre du nouveau pictogramme'
                 ],
                 'constraints' => [
                     new NotBlank(),
@@ -47,10 +50,17 @@ class PictogramFormType extends AbstractType
                 ]
             ])
             ->add('illustration', FileType::class, [
-                'label' => 'Illustration du pictogramme*: ',
+                'mapped' => false,
+                'row_attr' => [
+                    'class' => 'flex flex-col justify-between border-b'
+                ],
+                'label' => 'Illustration du nouveau pictogramme',
+                'label_attr' => [
+                    'class' => 'block ms-2 mb-2 text-sm font-medium text-gray-900 dark:text-white'
+                ],
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Illustration du pictogramme'
+                    'placeholder' => 'Illustration du nouveau pictogramme',
                 ],
                 'constraints' => [
                     new File([
@@ -62,38 +72,144 @@ class PictogramFormType extends AbstractType
                 ],
             ])
             ->add('category', EntityType::class, [
-                'label' => 'Catégorie du nouveau pictogramme :',
-                'required' => false,
+                'row_attr' => [
+                    'class' => 'border-b', 
+                ],
+                'label' => 'Catégorie du nouveau pictogramme',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => true,
                 'class' => Category::class,
-                'choice_label' => 'title',
+                'choice_label' => function (Category $category): string {
+                    return $category->getTitle();
+                },
                 'attr' => [
                     'placeholder' => 'Catégorie du nouveau pictogramme'
                 ],
             ])
             ->add('type', ChoiceType::class, [
-                'choices' =>
-                [null, 'verbe', 'nom', 'adjectif', 'adjectif', 'invariable', 'interrogatif', 'pronom_ou_determinant'],
+                'row_attr' => [
+                    'class' => 'border-b', 
+                ],
+                'mapped' => false,
+                'label' => 'Choisir type du nouveau pictogramme',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => true,
+                'choices' => [
+                    null, 'verbe', 'nom', 'adjectif', 
+                    'invariable', 'interrogatif', 'pronom_ou_determinant'
+                ],
                 'choice_value' => function (?string $s) {
                     return $s ? $s : '';
                 },
                 'choice_label' => function (?string $s) {
-                    return $s ? $s : 'Choisir type de la pictogramme';
+                    return $s ? $s : 'Choisir type du nouveau pictogramme';
                 },
             ])
-            ->add('irregular', EntityType::class, [
-                'class' => Irregular::class,
-                'choice_label' => 'id',
-            ])
-            ->add('conjugation', EntityType::class, [
+            ->add('verbe', ChoiceType::class, [
                 'mapped' => false,
-                'class' => Conjugation::class,
-                'choice_label' => 'id',
+                'label' => false,
+                // 'required' => false,
+                'choices' => [
+                    'auxiliaire_avoir' => 'auxiliaire_avoir',
+                    'auxiliaire_etre' => 'auxiliaire_etre'
+                ],
+                'expanded' => true
             ])
-            ->add('tags', EntityType::class, [
-                'class' => Tag::class,
-                'choice_label' => 'title',
-                'multiple' => true,
-            ]);
+            ->add('nom_pronom', ChoiceType::class, [
+                'mapped' => false,
+                'label' => false,
+                // 'required' => false,
+                'empty_data' => '',
+                'choices' => [
+                    'masculin' => 'masculin',
+                    'feminin' => 'feminin'
+                ],
+                'expanded' => true
+            ])
+            ->add('pronom', ChoiceType::class, [
+                'mapped' => false,
+                'label' => false,
+                // 'required' => false,
+                'choices' => [
+                    'singulier' => 'singulier',
+                    'pluriel' => 'pluriel'
+                ],
+                'choice_value' => function (?string $s) {
+                    return $s ? $s : '';
+                },
+                'choice_label' => function (?string $s) {
+                    return $s ? $s : 'Choisir sèxe du patient';
+                },
+                'expanded' => true
+            ])
+            ->add('irregular', CheckboxType::class, [
+                'mapped' => false,
+                'row_attr' => [
+                    'class' => 'flex flex-row items-center justify-start w-full z-10 mt-2 text-sm tracking-[0.15px]', 
+                ],
+                'label' => 'Est-ce que le mot est irregulier?',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+            ])            
+            ->add('participe_passe', TextType::class, [
+                'mapped' => false,
+                'label' => 'Définir participe passe',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Définir participe passe'
+                ],
+            ])      
+            ->add('pluriel', TextType::class, [
+                'mapped' => false,
+                'row_attr' => [
+                    'class' => 'border-b', 
+                ],
+                'label' => 'Définir pluriel',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Définir pluriel'
+                ],
+            ])  
+            ->add('feminin', TextType::class, [
+                'mapped' => false,
+                'label' => 'Définir feminin',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Définir feminin'
+                ],
+            ])
+            ->add('present', ConjugationFormType::class, [
+                'mapped' => false,
+                'label' => 'Présent',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+            ])
+            ->add('futur', ConjugationFormType::class, [
+                'mapped' => false,
+                'label' => 'Futur',
+                'label_attr' => [
+                    'class' => 'ms-2 text-sm font-medium text-gray-900'
+                ],
+                'required' => false,
+            ])
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

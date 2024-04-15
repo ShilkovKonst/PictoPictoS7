@@ -8,6 +8,9 @@ body {
 form div div ul {
   display: none;
 }
+/* input[type='file'] {
+  opacity: 0;
+} */
 
 @layer components {
   .alert {

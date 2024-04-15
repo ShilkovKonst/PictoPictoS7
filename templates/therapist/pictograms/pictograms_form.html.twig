@@ -5,8 +5,18 @@
 'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full'
 }
 }) }}
-<div class="w-full grid grid-cols-1 md:grid-cols-2 sm:gap-2 md:gap-4">
+<div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-2">
   {{ form_row(pictogramForm.title, {
+  'attr': {
+  'class': 'input-text z-10',
+  }
+  }) }}
+  {{ form_row(pictogramForm.illustration, {
+  'attr': {
+  'class': 'z-10 w-full mt-1 mb-3 pl-6 text-sm tracking-[0.15px] border-none outline-none bg-[#ecf0f3] rounded-lg shadow-inset-2/4 focus:shadow-inset-4/4 transition duration-300 ease-in-out',
+  },
+  }) }}
+  {{ form_row(pictogramForm.category, {
   'attr': {
   'class': 'input-text z-10',
   }
@@ -16,27 +26,77 @@
   'class': 'input-text z-10',
   }
   }) }}
-  {{ form_row(pictogramForm.illustration, {
-  'attr': {
-  'class': 'input-text z-10',
-  }
-  }) }}
-  {{ form_row(pictogramForm.category, {
-  'attr': {
-  'class': 'input-text z-10',
-  }
-  }) }}
-  {{ form_row(pictogramForm.tags, {
-  'attr': {
-  'class': 'input-text z-10',
-  }
-  }) }}
-  {# {{ form_row(pictogramForm.noteComment, {
-  'attr': {
-  'class': 'input-text z-10',
-  }
-  }) }} #}
+  <div class="border-b">
+    <p class="ms-2 my-1 text-sm font-medium text-gray-900">
+      Choisir des tags du nouveau pictogramme
+    </p>
+    <div>
+      <p id="tagPlaceholderEmpty" class="ms-2 my-1 text-sm text-gray-900" style="display: block;">
+        Il faut choisir un type du pictogramme
+      </p>
+      <p id="tagPlaceholderInvariable" class="ms-2 my-1 text-sm text-gray-900" style="display: none;">
+        Il n'y a rien à choisir
+      </p>
+      {{ form_row(pictogramForm.verbe, {
+      'attr': {
+      'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
+      'style': "display: none;"
+      }
+      }) }}
+      {{ form_row(pictogramForm.pronom, {
+      'attr': {
+      'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 border-b ms-2 text-sm font-medium text-gray-900',
+      'style': "display: none;"
+      }
+      }) }}
+      {{ form_row(pictogramForm.nom_pronom, {
+      'attr': {
+      'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
+      'style': "display: none;"
+      }
+      }) }}
+    </div>
+  </div>
+  <div id="irregularId" class="flex flex-col justify-start items-center border-b" style="display: none;">
+    {{ form_row(pictogramForm.irregular, {
+    'attr': {
+    'class': 'flex items-center justify-center h-4 w-4 ms-3',
+    }
+    }) }}
+    <div id="irregularFields" class="p-2" style="display: none;">
+      <div id="irregularVerb" class="" style="display: none;">
+        {{ form_row(pictogramForm.participe_passe, {
+        'attr': {
+        'class': 'input-text z-10 mb-2',
+        }
+        }) }}
+      </div>
+      <div id="irregularGenre" class="" style="display: none;">
+        {{ form_row(pictogramForm.pluriel, {
+        'attr': {
+        'class': 'input-text z-10 mb-2',
+        }
+        }) }}
+      </div>
+      <div id="irregularNumber" class="" style="display: none;">
+        {{ form_row(pictogramForm.feminin, {
+        'attr': {
+        'class': 'input-text z-10 mb-2',
+        }
+        }) }}
+      </div>
+    </div>
+  </div>
+  <div id="present_conjugationId" class="border-b" style="display: none;">
+    {{ form_row(pictogramForm.present, {
+    }) }}
+  </div>
+  <div id="futur_conjugationId" class="border-b" style="display: none;">
+    {{ form_row(pictogramForm.futur, {
+    }) }}
+  </div>
 </div>
+
 
 <button type="submit" class="btn-b">Valider</button>
 {{ form_end(pictogramForm) }}

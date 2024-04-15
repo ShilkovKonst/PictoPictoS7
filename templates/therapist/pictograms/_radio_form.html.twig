@@ -1,0 +1,9 @@
+<div id="{{ idType }}" class="flex-row-reverse gap-2 justify-end items-center border-b p-2" style="display: none;">
+  {% for tag in tags %}
+  <div class="flex items-center my-2">
+    <input id="{{ tag }}" type="radio" value="{{ tag }}" name="{{ idType }}"
+      class="w-4 h-4 text-pbg bg-gray-100 border-gray-300  ">
+    <label for="{{ tag }}" class="ms-2 text-sm font-medium text-gray-900 ">{{ tag }}</label>
+  </div>
+  {% endfor %}
+</div>

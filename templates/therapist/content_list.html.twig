@@ -69,9 +69,9 @@
     </a>
   </li>
   <li>
-    <a class="group {{ app.request.getPathInfo == path('therapist_pictograms_get_all') ? 'text-black font-medium' : 'hover:text-black' }} transition duration-150 ease-in-out flex items-center space-x-3 rtl:space-x-reverse"
+    <a class="group {{ app.request.getPathInfo starts with '/therapist/pictograms' ? 'text-black font-medium' : 'hover:text-black' }} transition duration-150 ease-in-out flex items-center space-x-3 rtl:space-x-reverse"
       href="{{ path('therapist_pictograms_get_all') }}">
-      <svg class="w-8 h-8 md:w-6 md:h-6 {{ app.request.getPathInfo == path('therapist_pictograms_get_all') ? 'text-pred' : 'text-pbg group-hover:text-pred' }} transition duration-150 ease-in-out" aria-hidden="true"
+      <svg class="w-8 h-8 md:w-6 md:h-6 {{ app.request.getPathInfo starts with '/therapist/pictograms' ? 'text-pred' : 'text-pbg group-hover:text-pred' }} transition duration-150 ease-in-out" aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z" clip-rule="evenodd" />
         <path fill-rule="evenodd"

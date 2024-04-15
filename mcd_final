@@ -97,7 +97,6 @@ erDiagram
         string filename
         date createdAt
         date updatedAt
-        int userId FK
         int categoryId FK
         int irregularId FK
     }
@@ -140,7 +139,6 @@ erDiagram
     PHRASE_PICTOGRAM }o--|| PICTOGRAM :consist_of
     PHRASE ||--o{ AUDIO_PHRASE : has
     QUESTION |o--o{ PHRASE : concerns
-    USER ||--o{ PICTOGRAM : creates
     CATEGORY ||--o{ PICTOGRAM : consists_of
     PICTOGRAM ||--o| IRREGULAR : can_be
     %% PICTOGRAM }o--o{ TAG : can_have

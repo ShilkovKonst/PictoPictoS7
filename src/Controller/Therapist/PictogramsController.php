@@ -2,9 +2,12 @@
 
 namespace App\Controller\Therapist;
 
+use App\Entity\Conjugation;
+use App\Entity\Irregular;
 use App\Entity\Pictogram;
 use App\Form\PictogramFormType;
 use App\Repository\PictogramRepository;
+use App\Repository\TagRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,10 +26,11 @@ class PictogramsController extends AbstractController
 {
     public function __construct(
         private UserRepository $uRepo,
-        private PictogramRepository $pictRepo
+        private PictogramRepository $pictRepo,
+        private TagRepository $tagRepo
     ) {
     }
-    
+
     #[Route('/', name: "therapist_pictograms_get_all")]
     public function getAllPictograms(Request $request): Response
     {
@@ -63,19 +67,85 @@ class PictogramsController extends AbstractController
         }
 
         $pictogram = new Pictogram();
-        $form = $this->createForm(PictogramFormType::class, $pictogram);
+        $form = $this->createForm(PictogramFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $pictogram->setTitle($form->get('title')->getData());
-            $pictogram->setCategory($form->get('category')->getData());
-            foreach ($form->get('tags')->getData() as $tag) {
-                $pictogram->addTag($tag);
+            $title = $form->get('title')->getData();
+            $pictogram->setTitle($title);
+
+            $category = $form->get('category')->getData();
+            $pictogram->setCategory($category);
+
+            $type = $form->get('type')->getData();
+            $pictogram->setType($type);
+
+            $pictogram->setCreatedAt(new DateTimeImmutable());
+            $pictogram->setUpdatedAt(new DateTimeImmutable());
+
+            // setting tags to entity
+            $tags = [];
+            // // recovering tags from form according 'type' of entity
+            if ($type == 'verbe') {
+                $aux = $form->get('verbe')->getData();
+                array_push($tags, $aux);
             }
+            if ($type == 'nom' || $type == 'pronom_ou_determinant') {
+                $genre = $form->get('nom_pronom')->getData();
+                array_push($tags, $genre);
+            }
+            if ($type == 'pronom_ou_determinant') {
+                $genre = $form->get('nom_pronom')->getData();
+                $number = $form->get('pronom')->getData();
+                array_push($tags, $genre);
+                array_push($tags, $number);
+            } // // populating entity by addTag()
+            foreach ($tags as $tag) {
+                $pictogram->addTag($this->tagRepo->findOneByTitle($tag));
+            }
+
+            // setting irregular if needed
+            if ($form->get('irregular')->getData()) {
+                $pictogram->addTag($this->tagRepo->findOneByTitle('irregulier'));
+                $irregular = new Irregular();
+
+                // if type - verb: setting irregular AND conjugations
+                if ($type == 'verbe') {
+                    $irregular->setPastParticiple($form->get('participe_passe')->getData());
+
+                    foreach (['present', 'futur'] as $tense) {
+                        $conjugation = new Conjugation();
+                        $conjugation->setTense($tense);
+                        $conjugation->setFirstPersonSingular($form->get($tense)->get('firstPersonSingular')->getData());
+                        $conjugation->setFirstPersonPlurial($form->get($tense)->get('firstPersonPlurial')->getData());
+                        $conjugation->setSecondPersonSingular($form->get($tense)->get('secondPersonSingular')->getData());
+                        $conjugation->setSecondPersonPlurial($form->get($tense)->get('secondPersonPlurial')->getData());
+                        $conjugation->setThirdPersonSingular($form->get($tense)->get('thirdPersonSingular')->getData());
+                        $conjugation->setThirdPersonPlurial($form->get($tense)->get('thirdPersonPlurial')->getData());
+
+                        $entityManager->persist($conjugation);
+
+                        $irregular->addConjugation($conjugation);
+                    }
+                }
+                // otherwise - setting irregular
+                if ($type == 'nom') {
+                    $irregular->setPlurial($form->get('pluriel')->getData());
+                }
+                if ($type == 'adjectif') {
+                    $irregular->setPlurial($form->get('pluriel')->getData());
+                    $irregular->setFeminin($form->get('feminin')->getData());
+                }
+                $entityManager->persist($irregular);
+                
+                $pictogram->setIrregular($irregular);
+            }
+
+            // setting illustration and filename to entity
             $imageFile = $form->get('illustration')->getData();
             /** @var UploadedFile $imageFile */
             $imageFile->getClientOriginalName();
-
+            $newFileName = '';
             if ($imageFile) {
                 $originalFileName = pathinfo(
                     $imageFile->getClientOriginalName(),
@@ -83,7 +153,6 @@ class PictogramsController extends AbstractController
                 );
                 $safeFilename = $slugger->slug($originalFileName);
                 $newFileName = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-
                 try {
                     $imageFile->move(
                         $this->getParameter('pictograms_directory'),
@@ -94,18 +163,16 @@ class PictogramsController extends AbstractController
                 $pictogram->setIllustration($form->get('illustration')->getData());
                 $pictogram->setFilename($newFileName);
             }
-            $pictogram->setCreatedAt(new DateTimeImmutable());
-            $pictogram->setUpdatedAt(new DateTimeImmutable());
 
-            dd($pictogram);
-            // $entityManager->persist($pictogram);
-            // $entityManager->flush();
+            // dd($pictogram);
+            $entityManager->persist($pictogram);
+            $entityManager->flush();
 
-            // $id = $this->pictRepo->findOneByFilename($form->get(''));
+            $id = $this->pictRepo->findOneByFilename($newFileName);
 
-            // return $this->redirectToRoute("therapist_pictograms_get_one", [
-            //     'code' => $id
-            // ]);
+            return $this->redirectToRoute("therapist_pictograms_get_one", [
+                'code' => $id
+            ]);
         } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
             $errors = $form->getErrors(true);
             foreach ($errors as $error) {
@@ -122,18 +189,17 @@ class PictogramsController extends AbstractController
     #[Route('/{code}', name: "therapist_pictograms_get_one")]
     public function getPictogramByCode($code): Response
     {
-        // /** @var User $user */
-        // $user = $this->getUser();
+        /** @var User $user */
+        $user = $this->getUser();
 
-        // /** @var pictogram $pictogram */        
-        // $pictogram = $this->patRepo->findOneByCode($code);
+        /** @var pictogram $pictogram */        
+        $pictogram = $this->pictRepo->findOneById($code);
 
         // $notes = $pictogram->getNotes();
 
         return $this->render('therapist/index.html.twig', [
-            // 'code' => $code,
-            // 'pictogram' => $pictogram,
-            // 'notes' => $notes
+            'code' => $code,
+            'pictogram' => $pictogram,
         ]);
     }
 
