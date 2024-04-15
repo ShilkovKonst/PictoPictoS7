@@ -19,7 +19,7 @@ Lis of {{ app.user.email }} patients
       {% include "therapist/content_list.html.twig" %}
 
       <div
-        class="relative w-full h-[95%] flex flex-col justify-between overflow-auto mt-3 md:mt-0 md:ml-3 p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
+        class="relative w-full h-[95%] flex flex-col justify-between overflow-auto mt-3 md:mt-0 md:ml-3 p-2 md:p-4 bg-[#ffffff80] shadow-inset-5/5 rounded-xl border border-solid border-t-[#ffffff59] border-l-[#ffffff59] border-r-[#dedfe059] border-b-[#dedfe059]">
         <!-- according to route shows sections -->
         {% if app.request.getPathInfo starts with '/therapist/profile' %}
         {% include "therapist/profile/profile.html.twig" %}

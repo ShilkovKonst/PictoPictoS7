@@ -32,7 +32,7 @@ class PictogramsController extends AbstractController
     }
 
     #[Route('/', name: "therapist_pictograms_get_all")]
-    public function getAllPictograms(Request $request): Response
+    public function getAllPictograms(Request $request, EntityManagerInterface $entityManager,): Response
     {
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
@@ -206,57 +206,23 @@ class PictogramsController extends AbstractController
     #[Route('/{code}/update', name: "therapist_pictograms_update_one")]
     public function updatePictogramByCode($code, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        // /** @var User $user */
-        // $user = $this->getUser();
-        // /** @var pictogram $pictogram */
-        // $pictogram = $this->patRepo->findOneByCode($code);
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($user == null) {
+            return $this->redirectToRoute('therapist_index');
+        }
 
-        // if (!$pictogram->isIsActive()) {  
-        //     $this->addFlash('danger', 'Dossier ' . $code . ' est inactif! Il est interdit changer les données du pictogram!');
+        /** @var pictogram $pictogram */
+        $pictogram = $this->pictRepo->findOneById($code);
+        $form = $this->createForm(PictogramFormType::class, $pictogram);
+        $form->handleRequest($request);
 
-        //     return $this->redirectToRoute('therapist_pictograms_get_one', [
-        //         'code' => $code
-        //     ]);
-        // }
-
-        // $form = $this->createForm(pictogramFormType::class, $pictogram);
-        // $form->handleRequest($request);
-
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $firstName = $form->get('firstName')->getData();
-        //     $pictogram->setFirstName($firstName);
-        //     $lastName = $form->get('lastName')->getData();
-        //     $pictogram->setLastName($lastName);
-        //     $pictogram->setGrade($form->get('grade')->getData());
-        //     $birthDate = DateTimeImmutable::createFromMutable($form->get('birthDate')->getData());
-        //     $pictogram->setBirthDate($birthDate);
-        //     $pictogram->setSex($form->get('sex')->getData());
-        //     $pictogram->setIsActive(true);
-        //     $pictogram->setUpdatedAt(new DateTimeImmutable());
-        //     $code = substr($user->getFirstName(), 0, 2) . substr($user->getLastName(), 0, 2) . '-' . substr($firstName, 0, 2) . substr($lastName, 0, 2) . '-' . $birthDate->format('Ymd');
-        //     $code = strtolower($slugger->slug($code));
-        //     $pictogram->setCode($code);
-
-        //     $entityManager->persist($pictogram);
-        //     $entityManager->flush();
-
-        //     $this->addFlash('success', 'Les données du pictogram sont mises à jour.');
-
-        //     return $this->redirectToRoute("therapist_pictograms_get_one", [
-        //         'code' => $code
-        //     ]);
-        // } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
-        //     $errors = $form->getErrors(true);
-        //     foreach ($errors as $error) {
-        //         $errorMessages[] = $error->getMessage();
-        //     }
-        //     $this->addFlash('danger', implode('<br>', $errorMessages));
-        // }
+        
 
         return $this->render('therapist/index.html.twig', [
-            // 'pictogramForm' => $form,
-            // 'code' => $code,
-            // 'pictogram' => $pictogram
+            'pictogramForm' => $form,
+            'code' => $code,
+            'pictogram' => $pictogram
         ]);
     }
 

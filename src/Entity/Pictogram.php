@@ -37,7 +37,7 @@ class Pictogram
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'pictograms')]
     private Collection $tags;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 25)]
     private ?string $type = null;
 
     public function __construct()

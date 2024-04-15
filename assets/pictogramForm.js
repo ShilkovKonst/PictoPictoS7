@@ -135,49 +135,58 @@ window.addEventListener("click", () => {
           pictogram_form_feminin.removeAttribute("required");
         }
       } else {
-        irregularFields.style.display = "none";
-        irregularVerb.style.display = "none";
-        pictogram_form_participe_passe.value = "";
-        pictogram_form_participe_passe.removeAttribute("required");
-        conjugationPresent.style.display = "none";
-        conjugationFutur.style.display = "none";
-
-        pictogram_form_pluriel.value = "";
-        irregularNumber.style.display = "none";
-        pictogram_form_pluriel.removeAttribute("required");
-        pictogram_form_feminin.value = "";
-        irregularGenre.style.display = "none";
-        pictogram_form_feminin.removeAttribute("required");
+        setAllToInitial(
+          irregularFields,
+          irregularVerb,
+          pictogram_form_participe_passe,
+          conjugationPresent,
+          conjugationFutur,
+          pictogram_form_present_firstPersonSingular,
+          pictogram_form_present_firstPersonPlurial,
+          pictogram_form_present_secondPersonSingular,
+          pictogram_form_present_secondPersonPlurial,
+          pictogram_form_present_thirdPersonSingular,
+          pictogram_form_present_thirdPersonPlurial,
+          pictogram_form_futur_firstPersonSingular,
+          pictogram_form_futur_firstPersonPlurial,
+          pictogram_form_futur_secondPersonSingular,
+          pictogram_form_futur_secondPersonPlurial,
+          pictogram_form_futur_thirdPersonSingular,
+          pictogram_form_futur_thirdPersonPlurial,
+          irregularNumber,
+          pictogram_form_pluriel,
+          irregularGenre,
+          pictogram_form_feminin
+        );
       }
     });
 
     pictogram_form_type.addEventListener("change", () => {
       // setting all to initial state
       irregularCheckbox.checked = false;
-      irregularVerb.style.display = "none";
-      pictogram_form_participe_passe.value = "";
-      pictogram_form_participe_passe.removeAttribute("required");
-      irregularNumber.style.display = "none";
-      pictogram_form_pluriel.value = "";
-      pictogram_form_pluriel.removeAttribute("required");
-      irregularGenre.style.display = "none";
-      pictogram_form_feminin.value = "";
-      pictogram_form_feminin.removeAttribute("required");
-      irregularFields.style.display = "none";
-      conjugationPresent.style.display = "none";
-      conjugationFutur.style.display = "none";
-      pictogram_form_present_firstPersonSingular.value = "";
-      pictogram_form_present_firstPersonPlurial.value = "";
-      pictogram_form_present_secondPersonSingular.value = "";
-      pictogram_form_present_secondPersonPlurial.value = "";
-      pictogram_form_present_thirdPersonSingular.value = "";
-      pictogram_form_present_thirdPersonPlurial.value = "";
-      pictogram_form_futur_firstPersonSingular.value = "";
-      pictogram_form_futur_firstPersonPlurial.value = "";
-      pictogram_form_futur_secondPersonSingular.value = "";
-      pictogram_form_futur_secondPersonPlurial.value = "";
-      pictogram_form_futur_thirdPersonSingular.value = "";
-      pictogram_form_futur_thirdPersonPlurial.value = "";
+      setAllToInitial(
+        irregularFields,
+        irregularVerb,
+        pictogram_form_participe_passe,
+        conjugationPresent,
+        conjugationFutur,
+        pictogram_form_present_firstPersonSingular,
+        pictogram_form_present_firstPersonPlurial,
+        pictogram_form_present_secondPersonSingular,
+        pictogram_form_present_secondPersonPlurial,
+        pictogram_form_present_thirdPersonSingular,
+        pictogram_form_present_thirdPersonPlurial,
+        pictogram_form_futur_firstPersonSingular,
+        pictogram_form_futur_firstPersonPlurial,
+        pictogram_form_futur_secondPersonSingular,
+        pictogram_form_futur_secondPersonPlurial,
+        pictogram_form_futur_thirdPersonSingular,
+        pictogram_form_futur_thirdPersonPlurial,
+        irregularNumber,
+        pictogram_form_pluriel,
+        irregularGenre,
+        pictogram_form_feminin
+      );
 
       if (pictogram_form_type.value != "") {
         pictoPlaceholderEmpty.style.display = "none";
@@ -238,7 +247,7 @@ window.addEventListener("click", () => {
         pictogram_form_pronom_1.removeAttribute("required");
       }
     });
-    
+
     if (location.pathname != "/therapist/pictograms/create") {
       pictogram_form_type.removeEventListener();
       irregularCheckbox.removeEventListener();
@@ -247,3 +256,54 @@ window.addEventListener("click", () => {
     isSetted = false;
   }
 });
+
+const setAllToInitial = (
+  irregularFields,
+  irregularVerb,
+  pictogram_form_participe_passe,
+  conjugationPresent,
+  conjugationFutur,
+  pictogram_form_present_firstPersonSingular,
+  pictogram_form_present_firstPersonPlurial,
+  pictogram_form_present_secondPersonSingular,
+  pictogram_form_present_secondPersonPlurial,
+  pictogram_form_present_thirdPersonSingular,
+  pictogram_form_present_thirdPersonPlurial,
+  pictogram_form_futur_firstPersonSingular,
+  pictogram_form_futur_firstPersonPlurial,
+  pictogram_form_futur_secondPersonSingular,
+  pictogram_form_futur_secondPersonPlurial,
+  pictogram_form_futur_thirdPersonSingular,
+  pictogram_form_futur_thirdPersonPlurial,
+  irregularNumber,
+  pictogram_form_pluriel,
+  irregularGenre,
+  pictogram_form_feminin
+) => {
+  irregularFields.style.display = "none";
+  irregularVerb.style.display = "none";
+
+  pictogram_form_participe_passe.value = "";
+  pictogram_form_participe_passe.removeAttribute("required");
+  conjugationPresent.style.display = "none";
+  conjugationFutur.style.display = "none";
+  pictogram_form_present_firstPersonSingular.value = "";
+  pictogram_form_present_firstPersonPlurial.value = "";
+  pictogram_form_present_secondPersonSingular.value = "";
+  pictogram_form_present_secondPersonPlurial.value = "";
+  pictogram_form_present_thirdPersonSingular.value = "";
+  pictogram_form_present_thirdPersonPlurial.value = "";
+  pictogram_form_futur_firstPersonSingular.value = "";
+  pictogram_form_futur_firstPersonPlurial.value = "";
+  pictogram_form_futur_secondPersonSingular.value = "";
+  pictogram_form_futur_secondPersonPlurial.value = "";
+  pictogram_form_futur_thirdPersonSingular.value = "";
+  pictogram_form_futur_thirdPersonPlurial.value = "";
+
+  irregularNumber.style.display = "none";
+  pictogram_form_pluriel.value = "";
+  pictogram_form_pluriel.removeAttribute("required");
+  irregularGenre.style.display = "none";
+  pictogram_form_feminin.value = "";
+  pictogram_form_feminin.removeAttribute("required");
+};

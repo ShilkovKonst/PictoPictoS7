@@ -1,34 +1,44 @@
+{% set isIrregular = false %}
 <table class="table w-full">
   <thead>
   </thead>
   <tbody class="flex flex-col gap-2">
     <tr
       class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-      <th class="text-start w-[40%] lg:w-[20%]">Prénom</th>
+      <th class="text-start w-[40%] lg:w-[20%]">Image</th>
+      <td class="text-start w-[45%] lg:w-[30%]">
+        <img src="{{ asset('img/picto/' ~ pictogram.filename) }}" alt="{{ pictogram.filename }}"
+          class="h-14 w-14 md:h-16 md:w-16">
+      </td>
+      <th class="text-start w-[40%] lg:w-[20%]">Titre</th>
       <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.title}}</td>
-      <th class="text-start w-[40%] lg:w-[20%]">Nom</th>
-      <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.filename}}</td>
     </tr>
     <tr
       class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-      <th class="text-start w-[40%] lg:w-[20%]">Date de naissance</th>
-      <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.type }}</td>
-      <th class="text-start w-[40%] lg:w-[20%]">Sèxe</th>
+      <th class="text-start w-[40%] lg:w-[20%]">Type du pictogramme</th>
+      <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.type == 'pronom_ou_determinant' ? 'pronom / determinant' :
+        pictogram.type }}</td>
+      <th class="text-start w-[40%] lg:w-[20%]">Date de creation</th>
       <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.createdAt|date("d/m/Y") }}</td>
     </tr>
-    {% set isIrregular = false %}
-    {% for pictoTag in pictogram.tags %}
-
-    {% if pictoTag.title is same as('irregulier') %}
-      {% set isIrregular = true %}
-    {% endif %}
-
     <tr
       class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-      <th class="text-start w-[40%] lg:w-[20%]">Education</th>
-      <td class="text-start w-[45%] lg:w-[30%]">{{ pictoTag.title }}</td>
+      <th class="text-start w-[100%]">Tags correspondants le pictogramme</th>
     </tr>
-    {% endfor %}
+    <tr
+      class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+      <td class="text-start w-[100%] flex flex-row flex-wrap justify-center items-center gap-2">
+        {% for tag in pictogram.tags %}
+
+        {% if tag.title is same as('irregulier') %}
+        {% set isIrregular = true %}
+        {% endif %}
+        <div class="border rounded-full p-1 cursor-pointer">
+          {{ tag.title }}
+        </div>
+        {% endfor %}
+      </td>
+    </tr>
 
     {% if isIrregular %}
     <tr class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
@@ -36,72 +46,133 @@
         <table class="table w-full">
           <thead>
             <tr class="  border-b">
-              <th class="text-lg p-2">Notes</th>
+              <th class="text-lg p-2">Pour ce pictogramme, les proprietés suivantes sont irreguliers </th>
             </tr>
           </thead>
           <tbody>
+            {% if pictogram.type is same as('nom') or pictogram.type is same as('adjectif') %}
             <tr
               class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ pictogram.irregular.feminin }}
-              </td>
-            </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+              <th class="text-start w-[40%] lg:w-[20%]">Pluriel</th>
               <td class="text-center w-1/3 ">
                 {{ pictogram.irregular.plurial }}
               </td>
             </tr>
+            {% endif %}
+
+            {% if pictogram.type is same as('adjectif') %}
             <tr
               class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+              <th class="text-start w-[40%] lg:w-[20%]">Feminin</th>
+              <td class="text-center w-1/3 ">
+                {{ pictogram.irregular.feminin }}
+              </td>
+            </tr>
+            {% endif %}
+
+            {% if pictogram.type is same as('verbe') %}
+            <tr
+              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+              <th class="text-start w-[40%] lg:w-[20%]">Participe passé</th>
               <td class="text-center w-1/3 ">
                 {{ pictogram.irregular.pastParticiple }}
               </td>
             </tr>
-            {% for conjugation in pictogram.irregular.conjugations %}
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ conjugation.tense }}
-              </td>
+            <tr class="  border-b">
+              <th class="text-lg p-2">Les conjugaisons pour présent et futur</th>
             </tr>
             <tr
               class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
               <td class="text-center w-1/3 ">
-                {{ conjugation.firstPersonSingular }}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        Personne
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Je / J'
+                      </th>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Tu
+                      </th>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Il / Elle / On
+                      </th>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Nous
+                      </th>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Vous
+                      </th>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <th class="text-center w-1/3 ">
+                        Ils / Elles
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
               </td>
-            </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
+              {% for conjugation in pictogram.irregular.conjugations %}
               <td class="text-center w-1/3 ">
-                {{ conjugation.firstPersonPlurial }}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        {{ conjugation.tense == 'present' ? 'Présent' : 'Futur'}}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.firstPersonSingular }}
+                      </td>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.firstPersonPlurial }}
+                      </td>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.secondPersonSingular }}
+                      </td>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.secondPersonPlurial }}
+                      </td>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.thirdPersonSingular }}
+                      </td>
+                    </tr>
+                    <tr class="text-sm sm:text-base p-2 border-b">
+                      <td class="text-center w-1/3 ">
+                        {{ conjugation.thirdPersonPlurial }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </td>
+              {% endfor %}
             </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ conjugation.secondPersonSingular }}
-              </td>
-            </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ conjugation.secondPersonPlurial }}
-              </td>
-            </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ conjugation.thirdPersonSingular }}
-              </td>
-            </tr>
-            <tr
-              class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-              <td class="text-center w-1/3 ">
-                {{ conjugation.thirdPersonPlurial }}
-              </td>
-            </tr>
-            {% endfor %}
+            {% endif %}
           </tbody>
         </table>
       </td>
