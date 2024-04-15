@@ -168,7 +168,7 @@ class PictogramsController extends AbstractController
             $entityManager->persist($pictogram);
             $entityManager->flush();
 
-            $id = $this->pictRepo->findOneByFilename($newFileName);
+            $id = $this->pictRepo->findOneByFilename($newFileName)->getId();
 
             return $this->redirectToRoute("therapist_pictograms_get_one", [
                 'code' => $id
