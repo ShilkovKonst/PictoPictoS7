@@ -36,21 +36,48 @@ class PictogramRepository extends ServiceEntityRepository
     //            ->getResult()
     //        ;
     //    }
-    
+
     /**
      * @return Category[] Returns an array of Category objects
      */
-    public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir): Paginator
+    public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir, string $filter, string $value): Paginator
     {
-        return new Paginator(
-            $this->createQueryBuilder('p')
-                ->orderBy('p.' . $sortBy, $sortDir)
-                ->setFirstResult(($page - 1) * $limit)
-                ->setMaxResults($limit)
-                ->getQuery()
-                ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
-            false
-        );
+        if ($value == '' || $filter == '') {
+            return new Paginator(
+                $this->createQueryBuilder('p')
+                    ->orderBy('p.' . $sortBy, $sortDir)
+                    ->setFirstResult(($page - 1) * $limit)
+                    ->setMaxResults($limit)
+                    ->getQuery()
+                    ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+                false
+            );
+        } else if ($filter == 'category') {
+            return new Paginator(
+                $this->createQueryBuilder('p')
+                    ->leftJoin('p.category', 'c')
+                    ->andWhere('c.title = :val')
+                    ->setParameter('val', $value)
+                    ->orderBy('p.' . $sortBy, $sortDir)
+                    ->setFirstResult(($page - 1) * $limit)
+                    ->setMaxResults($limit)
+                    ->getQuery()
+                    ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+                false
+            );
+        } else if ($filter == 'type') {
+            return new Paginator(
+                $this->createQueryBuilder('p')
+                    ->andWhere('p.type = :val')
+                    ->setParameter('val', $value)
+                    ->orderBy('p.' . $sortBy, $sortDir)
+                    ->setFirstResult(($page - 1) * $limit)
+                    ->setMaxResults($limit)
+                    ->getQuery()
+                    ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+                false
+            );
+        }
     }
 
     //    public function findOneBySomeField($value): ?Pictogram

@@ -34,7 +34,8 @@ class PatientController extends AbstractController
     #[Route('/', name: "therapist_patients_get_all")]
     public function getAllPatients(Request $request): Response
     {
-        // dd($request->getPathInfo());
+        $filter = $request->query->getString('filter', 'all');
+        $value = $request->query->getString('value', '');
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
         $page = $request->query->getInt('page', 1);
@@ -57,7 +58,9 @@ class PatientController extends AbstractController
             'step' => $step,
             'count' => $count,
             'sortBy' => $sortBy,
-            'sortDir' => $sortDir
+            'sortDir' => $sortDir,
+            'filter' => $filter, 
+            'value' => $value
         ]);
     }
 
@@ -89,7 +92,7 @@ class PatientController extends AbstractController
             $patient->setCreatedAt(new DateTimeImmutable());
             $patient->setUpdatedAt(new DateTimeImmutable());
             $patient->setTherapist($user);
-            $code = substr($user->getFirstName(), 0, 2) . substr($user->getLastName(), 0, 2) . '-' . substr($firstName, 0, 2) . substr($lastName, 0, 2) . '-' . $birthDate->format('Ymd');
+            $code = substr($user->getFirstName(), 0, 2) . substr($user->getLastName(), 0, 2) . '-' . substr($firstName, 0, 2) . substr($lastName, 0, 2) . '-' . uniqid();
             $code = strtolower($slugger->slug($code));
             $patient->setCode($code);
 

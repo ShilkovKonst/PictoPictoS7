@@ -1,6 +1,20 @@
 {% set isIrregular = false %}
 <table class="table w-full">
   <thead>
+    <tr class="  border-b">
+      <th class="text-lg flex justify-center items-center">
+        <span class=" mx-auto">
+          Pictogramme
+          <a class="hover:text-pred trasition duration-150 ease-in-out"
+            href="{{ path( 'therapist_pictograms_get_one', { code: code } ) }}">{{ pictogram.title }}</a>
+        </span>
+        {% include "therapist/_actions_header.html.twig" with {
+        path1: 'therapist_pictograms_update_one',
+        path2: 'therapist_pictograms_update_one',
+        code
+        } %}
+      </th>
+    </tr>
   </thead>
   <tbody class="flex flex-col gap-2">
     <tr
@@ -15,11 +29,11 @@
     </tr>
     <tr
       class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
-      <th class="text-start w-[40%] lg:w-[20%]">Type du pictogramme</th>
+      <th class="text-start w-[40%] lg:w-[20%]">Type</th>
       <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.type == 'pronom_ou_determinant' ? 'pronom / determinant' :
         pictogram.type }}</td>
-      <th class="text-start w-[40%] lg:w-[20%]">Date de creation</th>
-      <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.createdAt|date("d/m/Y") }}</td>
+      <th class="text-start w-[40%] lg:w-[20%]">Catégorie</th>
+      <td class="text-start w-[45%] lg:w-[30%]">{{ pictogram.category.title }}</td>
     </tr>
     <tr
       class="flex flex-row flex-wrap gap-1 lg:gap-0 justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
@@ -40,7 +54,7 @@
       </td>
     </tr>
 
-    {% if isIrregular %}
+    {% if pictogram.irregular %}
     <tr class="flex flex-row flex-wrap justify-start items-start md:items-center text-sm sm:text-base p-2 border-b">
       <td class="w-full">
         <table class="table w-full">

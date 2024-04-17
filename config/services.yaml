@@ -6,6 +6,7 @@
 parameters:
     images: '/img/'
     images_directory: '%kernel.project_dir%/assets%images%'
+    images_directory_temp: '%kernel.project_dir%/assets%images%temp'
     categories: '/cat/'
     categories_directory: '%kernel.project_dir%/assets%images%%categories%'
     pictograms: '/picto/'

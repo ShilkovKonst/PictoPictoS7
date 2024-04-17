@@ -6,6 +6,7 @@ use App\Entity\Conjugation;
 use App\Entity\Irregular;
 use App\Entity\Pictogram;
 use App\Form\PictogramFormType;
+use App\Repository\CategoryRepository;
 use App\Repository\PictogramRepository;
 use App\Repository\TagRepository;
 use App\Repository\UserRepository;
@@ -27,32 +28,39 @@ class PictogramsController extends AbstractController
     public function __construct(
         private UserRepository $uRepo,
         private PictogramRepository $pictRepo,
-        private TagRepository $tagRepo
+        private TagRepository $tagRepo,
+        private CategoryRepository $catRepo
     ) {
     }
 
     #[Route('/', name: "therapist_pictograms_get_all")]
     public function getAllPictograms(Request $request, EntityManagerInterface $entityManager,): Response
     {
+        $categories = $this->catRepo->findAll();
+        $filter = $request->query->getString('filter', 'all');
+        $value = $request->query->getString('value', '');
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
         $page = $request->query->getInt('page', 1);
         $limit = 5;
         $step = 5;
         /** @var ArrayCollection $pictograms */
-        $pictograms = $this->pictRepo->findAllWithPaginator($limit, $page, $sortBy, $sortDir);
+        $pictograms = $this->pictRepo->findAllWithPaginator($limit, $page, $sortBy, $sortDir, $filter, $value);
         $count = $pictograms->count();
         $maxPages = ceil($count / $limit);
         if ($page < 1) $page = 1;
         if ($page > $maxPages) $page = $maxPages;
 
         return $this->render('therapist/index.html.twig', [
+            'categories' => $categories,
             'pictograms' => $pictograms,
             'page' => $page,
             'maxPages' => $maxPages,
             'step' => $step,
             'sortBy' => $sortBy,
-            'sortDir' => $sortDir
+            'sortDir' => $sortDir,
+            'filter' => $filter, 
+            'value' => $value
         ]);
     }
 
@@ -155,7 +163,7 @@ class PictogramsController extends AbstractController
                 $newFileName = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
                 try {
                     $imageFile->move(
-                        $this->getParameter('pictograms_directory'),
+                        $this->getParameter('pictograms_directory_temp'),
                         $newFileName
                     );
                 } catch (FileException $e) {
@@ -194,8 +202,7 @@ class PictogramsController extends AbstractController
 
         /** @var pictogram $pictogram */        
         $pictogram = $this->pictRepo->findOneById($code);
-
-        // $notes = $pictogram->getNotes();
+// dd($pictogram);
 
         return $this->render('therapist/index.html.twig', [
             'code' => $code,

@@ -1,4 +1,10 @@
-<div class="text-lg text-center font-bold p-2 border-b">Créer un nouveau pictogramme</div>
+<div class="text-lg text-center font-bold p-2 border-b">
+  Mettre à jour pictogramme 
+  <a href="{{ path('therapist_pictograms_get_one', { code }) }}">{{ pictogram.title }}</a>
+</div>
+<pre>
+  {{ dump(pictogram, pictogramForm.irregular.vars.data) }}
+</pre>
 
 {{ form_start(pictogramForm, {
 'attr': {
@@ -28,7 +34,7 @@
   }) }}
   <div class="border-b">
     <p class="ms-2 my-1 text-sm font-medium text-gray-900">
-      Choisir des tags du nouveau pictogramme
+      Choisir des tags du pictogramme
     </p>
     <div>
       <p id="tagPlaceholderEmpty" class="ms-2 my-1 text-sm text-gray-900" style="display: block;">
@@ -40,45 +46,45 @@
       {{ form_row(pictogramForm.verbe, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
-      'style': "display: none;"
+      'style': pictogramForm.type.vars.data == 'verbe' ? 'display: block;' : 'display: none;'
       }
       }) }}
       {{ form_row(pictogramForm.pronom, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 border-b ms-2 text-sm font-medium text-gray-900',
-      'style': "display: none;"
+      'style': pictogramForm.type.vars.data == 'pronom_ou_determinant' ? 'display: block;' : 'display: none;'
       }
       }) }}
       {{ form_row(pictogramForm.nom_pronom, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
-      'style': "display: none;"
+      'style': pictogramForm.type.vars.data in ['nom', 'pronom_ou_determinant'] ? 'display: block;' : 'display: none;'
       }
       }) }}
     </div>
   </div>
-  <div id="irregularId" class="flex flex-col justify-start items-center border-b" style="display: none;">
+  <div id="irregularId" class="flex flex-col justify-start items-center border-b" {{ pictogramForm.type.vars.data in ['verbe', 'nom', 'adjectif'] ? "style='display: block;'" : "style='display: none;'" }}>
     {{ form_row(pictogramForm.irregular, {
     'attr': {
     'class': 'flex items-center justify-center h-4 w-4 ms-3',
     }
     }) }}
-    <div id="irregularFields" class="p-2" style="display: none;">
-      <div id="irregularVerb" class="" style="display: none;">
+    <div id="irregularFields" class="p-2" {{ pictogramForm.irregular.vars.data ? "style='display: block;'" : "style='display: none;'" }}>
+      <div id="irregularVerb" {{ pictogramForm.type.vars.data == 'verbe' ? "style='display: block;'" : "style='display: none;'" }}>
         {{ form_row(pictogramForm.participe_passe, {
         'attr': {
         'class': 'input-text z-10 mb-2',
         }
         }) }}
       </div>
-      <div id="irregularGenre" class="" style="display: none;">
+      <div id="irregularGenre" {{ pictogramForm.type.vars.data == 'adjectif' ? "style='display: block;'" : "style='display: none;'" }}>
         {{ form_row(pictogramForm.feminin, {
         'attr': {
         'class': 'input-text z-10 mb-2',
         }
         }) }}
       </div>
-      <div id="irregularNumber" class="" style="display: none;">
+      <div id="irregularNumber" {{ pictogramForm.type.vars.data in ['nom', 'adjectif'] ? "style='display: block;'" : "style='display: none;'" }}>
         {{ form_row(pictogramForm.pluriel, {
         'attr': {
         'class': 'input-text z-10 mb-2',
@@ -87,11 +93,11 @@
       </div>
     </div>
   </div>
-  <div id="present_conjugationId" class="border-b" style="display: none;">
+  <div id="present_conjugationId" class="border-b" {{ pictogramForm.type.vars.data == 'verbe' ? "style='display: block;'" : "style='display: none;'" }}>
     {{ form_row(pictogramForm.present, {
     }) }}
   </div>
-  <div id="futur_conjugationId" class="border-b" style="display: none;">
+  <div id="futur_conjugationId" class="border-b" {{ pictogramForm.type.vars.data == 'verbe' ? "style='display: block;'" : "style='display: none;'" }}>
     {{ form_row(pictogramForm.futur, {
     }) }}
   </div>

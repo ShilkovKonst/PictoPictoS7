@@ -26,18 +26,41 @@ class PictogramFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
+        $pictogram = null;
+        $tags = [];
+        $conjugationPresent= null;
+        $conjugationFutur= null;
+
+        if (array_key_exists('data', $options)) {
+            $pictogram = $options['data'];
+
+            foreach ($pictogram->getTags() as $t) {
+                array_push($tags, $t->getTitle());
+            }
+            if ($pictogram->getType() == 'verbe' && $pictogram->getIrregular() != null) {
+                foreach ($pictogram->getIrregular()->getConjugations() as $c) {
+                    if ($c->getTense() == 'present') {
+                        $conjugationPresent = $c;
+                    }if ($c->getTense() == 'futur') {
+                        $conjugationFutur = $c;
+                    }
+                }
+            }
+        }
+
         $builder
             ->add('title', TextType::class, [
                 'row_attr' => [
-                    'class' => 'border-b', 
+                    'class' => 'border-b',
                 ],
-                'label' => 'Titre du nouveau pictogramme',
+                'label' => 'Titre du pictogramme',
                 'label_attr' => [
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Titre du nouveau pictogramme'
+                    'placeholder' => 'Titre du pictogramme'
                 ],
                 'constraints' => [
                     new NotBlank(),
@@ -54,13 +77,13 @@ class PictogramFormType extends AbstractType
                 'row_attr' => [
                     'class' => 'flex flex-col justify-between border-b'
                 ],
-                'label' => 'Illustration du nouveau pictogramme',
+                'label' => 'Illustration du pictogramme',
                 'label_attr' => [
-                    'class' => 'block ms-2 mb-2 text-sm font-medium text-gray-900 dark:text-white'
+                    'class' => 'block ms-2 mb-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Illustration du nouveau pictogramme',
+                    'placeholder' => 'Illustration du pictogramme',
                 ],
                 'constraints' => [
                     new File([
@@ -73,9 +96,9 @@ class PictogramFormType extends AbstractType
             ])
             ->add('category', EntityType::class, [
                 'row_attr' => [
-                    'class' => 'border-b', 
+                    'class' => 'border-b',
                 ],
-                'label' => 'Catégorie du nouveau pictogramme',
+                'label' => 'Catégorie du pictogramme',
                 'label_attr' => [
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
@@ -85,28 +108,28 @@ class PictogramFormType extends AbstractType
                     return $category->getTitle();
                 },
                 'attr' => [
-                    'placeholder' => 'Catégorie du nouveau pictogramme'
+                    'placeholder' => 'Catégorie du pictogramme'
                 ],
             ])
             ->add('type', ChoiceType::class, [
                 'row_attr' => [
-                    'class' => 'border-b', 
+                    'class' => 'border-b',
                 ],
-                'mapped' => false,
-                'label' => 'Choisir type du nouveau pictogramme',
+                'mapped' => true,
+                'label' => 'Choisir type du pictogramme',
                 'label_attr' => [
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => true,
                 'choices' => [
-                    null, 'verbe', 'nom', 'adjectif', 
+                    null, 'verbe', 'nom', 'adjectif',
                     'invariable', 'interrogatif', 'pronom_ou_determinant'
                 ],
                 'choice_value' => function (?string $s) {
                     return $s ? $s : '';
                 },
                 'choice_label' => function (?string $s) {
-                    return $s ? $s : 'Choisir type du nouveau pictogramme';
+                    return $s ? $s : 'Choisir type du pictogramme';
                 },
             ])
             ->add('verbe', ChoiceType::class, [
@@ -117,7 +140,8 @@ class PictogramFormType extends AbstractType
                     'auxiliaire_avoir' => 'auxiliaire_avoir',
                     'auxiliaire_etre' => 'auxiliaire_etre'
                 ],
-                'expanded' => true
+                'expanded' => true,
+                'data' => $pictogram && in_array('auxiliaire_avoir', $tags) ? 'auxiliaire_avoir' : (in_array('auxiliaire_etre', $tags) ? 'auxiliaire_etre' : ''),
             ])
             ->add('nom_pronom', ChoiceType::class, [
                 'mapped' => false,
@@ -128,7 +152,8 @@ class PictogramFormType extends AbstractType
                     'masculin' => 'masculin',
                     'feminin' => 'feminin'
                 ],
-                'expanded' => true
+                'expanded' => true,
+                'data' => $pictogram && in_array('masculin', $tags) ? 'masculin' : (in_array('feminin', $tags) ? 'feminin' : ''),
             ])
             ->add('pronom', ChoiceType::class, [
                 'mapped' => false,
@@ -144,19 +169,21 @@ class PictogramFormType extends AbstractType
                 'choice_label' => function (?string $s) {
                     return $s ? $s : 'Choisir sèxe du patient';
                 },
-                'expanded' => true
+                'expanded' => true,
+                'data' => $pictogram && in_array('singulier', $tags) ? 'singulier' : (in_array('pluriel', $tags) ? 'pluriel' : ''),
             ])
             ->add('irregular', CheckboxType::class, [
                 'mapped' => false,
                 'row_attr' => [
-                    'class' => 'flex flex-row items-center justify-start w-full z-10 mt-2 text-sm tracking-[0.15px]', 
+                    'class' => 'flex flex-row items-center justify-start w-full z-10 mt-2 text-sm tracking-[0.15px]',
                 ],
                 'label' => 'Est-ce que le mot est irregulier?',
                 'label_attr' => [
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => false,
-            ])            
+                'data' => $pictogram && in_array('irregulier', $tags) ? true : false,
+            ])
             ->add('participe_passe', TextType::class, [
                 'mapped' => false,
                 'label' => 'Définir participe passe',
@@ -167,11 +194,12 @@ class PictogramFormType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Définir participe passe'
                 ],
-            ])      
+                'data' => $pictogram && $pictogram->getIrregular() && $pictogram->getIrregular()->getPastParticiple() != null ? $pictogram->getIrregular()->getPastParticiple() : '',
+            ])
             ->add('pluriel', TextType::class, [
                 'mapped' => false,
                 'row_attr' => [
-                    'class' => 'border-b', 
+                    'class' => 'border-b',
                 ],
                 'label' => 'Définir pluriel',
                 'label_attr' => [
@@ -181,7 +209,8 @@ class PictogramFormType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Définir pluriel'
                 ],
-            ])  
+                'data' => $pictogram && $pictogram->getIrregular() && $pictogram->getIrregular()->getPlurial() != null ? $pictogram->getIrregular()->getPlurial() : '',
+            ])
             ->add('feminin', TextType::class, [
                 'mapped' => false,
                 'label' => 'Définir feminin',
@@ -192,6 +221,7 @@ class PictogramFormType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Définir feminin'
                 ],
+                'data' => $pictogram && $pictogram->getIrregular() && $pictogram->getIrregular()->getFeminin() != null ? $pictogram->getIrregular()->getFeminin() : '',
             ])
             ->add('present', ConjugationFormType::class, [
                 'mapped' => false,
@@ -200,6 +230,7 @@ class PictogramFormType extends AbstractType
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => false,
+                'data' => $conjugationPresent ? $conjugationPresent : '',
             ])
             ->add('futur', ConjugationFormType::class, [
                 'mapped' => false,
@@ -208,8 +239,8 @@ class PictogramFormType extends AbstractType
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => false,
-            ])
-            ;
+                'data' => $conjugationFutur ? $conjugationFutur : '',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

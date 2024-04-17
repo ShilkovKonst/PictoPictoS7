@@ -2,7 +2,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page != 1 %}
-    <a href="{{ path(path, { sortBy, sortDir, page: 1 }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: 1, filter, value }) }}"
       class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
       {{ 1 }}
     </a>
@@ -11,7 +11,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page > step %}
-    <a href="{{ path(path, { sortBy, sortDir, page: page - step }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: page - step, filter, value }) }}"
       class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center">
       <svg class="w-4 h-4 sm:w-6 sm:h-6 text-[#f9f9f9]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
         height="24" fill="none" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page > 1 %}
-    <a href="{{ path(path, { sortBy, sortDir, page: page - 1 }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: page - 1, filter, value }) }}"
       class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center">
       <svg class="w-4 h-4 sm:w-6 sm:h-6 text-[#f9f9f9]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
         height="24" fill="none" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page < maxPages %} 
-    <a href="{{ path(path, { sortBy, sortDir, page: page + 1 }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: page + 1, filter, value }) }}"
       class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center">
       <svg class="w-4 h-4 sm:w-6 sm:h-6 text-[#f9f9f9]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
         height="24" fill="none" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page <= maxPages - step %} 
-    <a href="{{ path(path, { sortBy, sortDir, page: page + step }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: page + step , filter, value }) }}"
       class="btn-a w-auto min-w-5 md:min-w-10 flex flex-row justify-center items-center">
       <svg class="w-4 h-4 md:w-6 md:h-6 text-[#f9f9f9]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
         height="24" fill="none" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
 
   <div class=" min-w-5 sm:min-w-10">
     {% if page != maxPages %}
-    <a href="{{ path(path, { sortBy, sortDir, page: maxPages }) }}"
+    <a href="{{ path(path, { sortBy, sortDir, page: maxPages, filter, value }) }}"
       class="btn-a w-auto min-w-5 sm:min-w-10 flex flex-row justify-center items-center font-normal">
       {{ maxPages }}
     </a>

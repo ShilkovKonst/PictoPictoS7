@@ -130,6 +130,8 @@ class UserController extends AbstractController
     #[Route('/therapists', name: "therapist_therapists")]
     public function getAllTherapists(Request $request): Response
     {
+        $criteria = $request->query->getString('filter', 'all');
+        $value = $request->query->getString('value', '');
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
         $page = $request->query->getInt('page', 1);
@@ -150,13 +152,17 @@ class UserController extends AbstractController
             'step' => $step,
             'count' => $count,
             'sortBy' => $sortBy,
-            'sortDir' => $sortDir
+            'sortDir' => $sortDir,
+            'filter' => $criteria, 
+            'value' => $value
         ]);
     }
 
     #[Route('/categories', name: "therapist_categories")]
     public function getAllCategories(Request $request): Response
     {
+        $criteria = $request->query->getString('filter', 'all');
+        $value = $request->query->getString('value', '');
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
         $page = $request->query->getInt('page', 1);
@@ -176,13 +182,17 @@ class UserController extends AbstractController
             'step' => $step,
             'count' => $count,
             'sortBy' => $sortBy,
-            'sortDir' => $sortDir
+            'sortDir' => $sortDir,
+            'filter' => $criteria, 
+            'value' => $value
         ]);
     }
 
     #[Route('/institutions', name: "therapist_institutions")]
     public function getAllInstitutions(Request $request): Response
     {
+        $criteria = $request->query->getString('filter', 'all');
+        $value = $request->query->getString('value', '');
         $sortBy = $request->query->getString('sortBy', 'id');
         $sortDir = $request->query->getString('sortDir', 'ASC');
         $page = $request->query->getInt('page', 1);
@@ -202,7 +212,9 @@ class UserController extends AbstractController
             'step' => $step,
             'count' => $count,
             'sortBy' => $sortBy,
-            'sortDir' => $sortDir
+            'sortDir' => $sortDir,
+            'filter' => $criteria, 
+            'value' => $value
         ]);
     }
 }

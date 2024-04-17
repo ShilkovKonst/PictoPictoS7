@@ -1,7 +1,8 @@
 let isSetted = false;
+const updatePathRegex = /^\/therapist\/pictograms\/\w+\/update$/
 
 window.addEventListener("click", () => {
-  if (location.pathname == "/therapist/pictograms/create" && !isSetted) {
+  if ((location.pathname == "/therapist/pictograms/create" || updatePathRegex.test(location.pathname)) && !isSetted) {
     isSetted = true;
 
     const irregularCheckbox = document.getElementById(
@@ -162,6 +163,8 @@ window.addEventListener("click", () => {
     });
 
     pictogram_form_type.addEventListener("change", () => {
+      
+    console.log('from inside listener', isSetted)
       // setting all to initial state
       irregularCheckbox.checked = false;
       setAllToInitial(
@@ -248,11 +251,11 @@ window.addEventListener("click", () => {
       }
     });
 
-    if (location.pathname != "/therapist/pictograms/create") {
+    if (location.pathname != "/therapist/pictograms/create" || !updatePathRegex.test(location.pathname)) {
       pictogram_form_type.removeEventListener();
       irregularCheckbox.removeEventListener();
     }
-  } else if (location.pathname != "/therapist/pictograms/create" && isSetted) {
+  } else if ((location.pathname != "/therapist/pictograms/create" || !updatePathRegex.test(location.pathname)) && isSetted) {
     isSetted = false;
   }
 });
