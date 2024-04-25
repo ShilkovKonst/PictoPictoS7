@@ -13,9 +13,11 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class PictogramFormType extends AbstractType
 {
@@ -29,8 +31,8 @@ class PictogramFormType extends AbstractType
 
         $pictogram = null;
         $tags = [];
-        $conjugationPresent= null;
-        $conjugationFutur= null;
+        $conjugationPresent = null;
+        $conjugationFutur = null;
 
         if (array_key_exists('data', $options)) {
             $pictogram = $options['data'];
@@ -42,13 +44,14 @@ class PictogramFormType extends AbstractType
                 foreach ($pictogram->getIrregular()->getConjugations() as $c) {
                     if ($c->getTense() == 'present') {
                         $conjugationPresent = $c;
-                    }if ($c->getTense() == 'futur') {
+                    }
+                    if ($c->getTense() == 'futur') {
                         $conjugationFutur = $c;
                     }
                 }
             }
         }
-
+// dd($pictogram && $pictogram->getFilename());
         $builder
             ->add('title', TextType::class, [
                 'row_attr' => [
@@ -81,17 +84,18 @@ class PictogramFormType extends AbstractType
                 'label_attr' => [
                     'class' => 'block ms-2 mb-2 text-sm font-medium text-gray-900'
                 ],
-                'required' => true,
                 'attr' => [
                     'placeholder' => 'Illustration du pictogramme',
                 ],
+                'required' => $pictogram && $pictogram->getFilename() ? false : true,
                 'constraints' => [
                     new File([
                         'mimeTypes' => [
                             'image/gif', 'image/png',
                         ],
                         'mimeTypesMessage' => "Veuillez insérer un fichier au format png ou gif.",
-                    ])
+                    ]),
+                    new Callback([$this, 'validateFilename'])
                 ],
             ])
             ->add('category', EntityType::class, [
@@ -135,18 +139,23 @@ class PictogramFormType extends AbstractType
             ->add('verbe', ChoiceType::class, [
                 'mapped' => false,
                 'label' => false,
-                // 'required' => false,
+                'placeholder' => false,
+                'required' => false,
                 'choices' => [
                     'auxiliaire_avoir' => 'auxiliaire_avoir',
                     'auxiliaire_etre' => 'auxiliaire_etre'
                 ],
                 'expanded' => true,
                 'data' => $pictogram && in_array('auxiliaire_avoir', $tags) ? 'auxiliaire_avoir' : (in_array('auxiliaire_etre', $tags) ? 'auxiliaire_etre' : ''),
+                'constraints' => [
+                    new Callback([$this, 'validateVerbe'])
+                ]
             ])
             ->add('nom_pronom', ChoiceType::class, [
                 'mapped' => false,
                 'label' => false,
-                // 'required' => false,
+                'placeholder' => false,
+                'required' => false,
                 'empty_data' => '',
                 'choices' => [
                     'masculin' => 'masculin',
@@ -154,11 +163,15 @@ class PictogramFormType extends AbstractType
                 ],
                 'expanded' => true,
                 'data' => $pictogram && in_array('masculin', $tags) ? 'masculin' : (in_array('feminin', $tags) ? 'feminin' : ''),
+                'constraints' => [
+                    new Callback([$this, 'validateNomPronom'])
+                ]
             ])
             ->add('pronom', ChoiceType::class, [
                 'mapped' => false,
                 'label' => false,
-                // 'required' => false,
+                'placeholder' => false,
+                'required' => false,
                 'choices' => [
                     'singulier' => 'singulier',
                     'pluriel' => 'pluriel'
@@ -171,6 +184,9 @@ class PictogramFormType extends AbstractType
                 },
                 'expanded' => true,
                 'data' => $pictogram && in_array('singulier', $tags) ? 'singulier' : (in_array('pluriel', $tags) ? 'pluriel' : ''),
+                'constraints' => [
+                    new Callback([$this, 'validatePronom'])
+                ]
             ])
             ->add('irregular', CheckboxType::class, [
                 'mapped' => false,
@@ -230,7 +246,7 @@ class PictogramFormType extends AbstractType
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => false,
-                'data' => $conjugationPresent ? $conjugationPresent : '',
+                'data' => $conjugationPresent ? $conjugationPresent : null,
             ])
             ->add('futur', ConjugationFormType::class, [
                 'mapped' => false,
@@ -239,7 +255,7 @@ class PictogramFormType extends AbstractType
                     'class' => 'ms-2 text-sm font-medium text-gray-900'
                 ],
                 'required' => false,
-                'data' => $conjugationFutur ? $conjugationFutur : '',
+                'data' => $conjugationFutur ? $conjugationFutur : null,
             ]);
     }
 
@@ -248,5 +264,41 @@ class PictogramFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Pictogram::class,
         ]);
+    }
+
+    public function validateFilename($value, ExecutionContextInterface $context, ?Pictogram $pictogram)
+    {
+        if ($pictogram && !$pictogram->getFilename()) {
+            $context->buildViolation('This field is required because filename is not set.')
+                ->atPath('illustration') // Замените на имя вашего поля
+                ->addViolation();
+        }
+    }
+
+    public function validateVerbe($value, ExecutionContextInterface $context, ?Pictogram $pictogram)
+    {
+        if ($pictogram && $pictogram->getType() === 'verbe') {
+            $context->buildViolation('This field is required because filename is not set.')
+                ->atPath('verbe') // Замените на имя вашего поля
+                ->addViolation();
+        }
+    }
+
+    public function validateNomPronom($value, ExecutionContextInterface $context, ?Pictogram $pictogram)
+    {
+        if ($pictogram && ($pictogram->getType() === 'nom' || $pictogram->getType() === 'pronom_ou_determinant')) {
+            $context->buildViolation('This field is required because filename is not set.')
+                ->atPath('nom_pronom') // Замените на имя вашего поля
+                ->addViolation();
+        }
+    }
+
+    public function validatePronom($value, ExecutionContextInterface $context, ?Pictogram $pictogram)
+    {
+        if ($pictogram && $pictogram->getType() === 'pronom_ou_determinant') {
+            $context->buildViolation('This field is required because filename is not set.')
+                ->atPath('pronom') // Замените на имя вашего поля
+                ->addViolation();
+        }
     }
 }

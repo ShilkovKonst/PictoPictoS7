@@ -1,0 +1,53 @@
+
+<div class="absolute top-0 right-0 h-full bg-pform max-w-40">
+    {% include "session/_header.html.twig" %}
+    {# dropdown menu to switch between session modes #}
+    <div class="flex flex-col items-center p-2 border-b border-gray-300">
+        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" data-dropdown-offset-distance="10"
+            data-dropdown-offset-skidding="0"
+            class="text-white bg-pbg hover:bg-pred transition ease-in-out duration-300 font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center"
+            type="button">
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14" />
+            </svg>
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd"
+                    d="M18.425 10.271C19.499 8.967 18.57 7 16.88 7H7.12c-1.69 0-2.618 1.967-1.544 3.271l4.881 5.927a2 2 0 0 0 3.088 0l4.88-5.927Z"
+                    clip-rule="evenodd" />
+            </svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-300 rounded-lg shadow">
+            <ul class="py-2 text-sm text-gray-700 " aria-labelledby="dropdownDefaultButton">
+                {% if app.request.getPathInfo is not same as(path('app_therapist_session_dialogue')) %}
+                <li>
+                    {% include "session/_index_section.html.twig" with {
+                    path: 'app_therapist_session_dialogue',
+                    title: 'Dialogue' } %}
+                </li>
+                {% endif %}
+                {% if app.request.getPathInfo is not same as(path('app_therapist_session_exchange')) %}
+                <li>
+                    {% include "session/_index_section.html.twig" with {
+                    path: 'app_therapist_session_exchange',
+                    title: 'Echange' } %}
+                </li>
+                {% endif %}
+                {% if app.request.getPathInfo is not same as(path('app_therapist_session_game')) %}
+                <li>
+                    {% include "session/_index_section.html.twig" with {
+                    path: 'app_therapist_session_game',
+                    title: 'Jeu de mémoire' } %}
+                </li>
+                {% endif %}
+            </ul>
+            <div>
+                {% include "session/_index_section.html.twig" with {
+                path: 'app_therapist_session_exit',
+                title: 'Quitter la session' } %}
+            </div>
+        </div>
+    </div>
+</div>

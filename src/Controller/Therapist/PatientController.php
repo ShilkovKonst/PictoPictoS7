@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -59,7 +60,7 @@ class PatientController extends AbstractController
             'count' => $count,
             'sortBy' => $sortBy,
             'sortDir' => $sortDir,
-            'filter' => $filter, 
+            'filter' => $filter,
             'value' => $value
         ]);
     }
@@ -136,7 +137,7 @@ class PatientController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        /** @var Patient $patient */        
+        /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
         $notes = $patient->getNotes();
@@ -148,6 +149,29 @@ class PatientController extends AbstractController
         ]);
     }
 
+    #[Route('/{code}/session/create', name: "therapist_patients_create_session")]
+    public function createPatientSessionByCode($code, Session $session): Response
+    {
+        if ($session->get('patient')) {
+            // dd($session->get('patient'));
+            $session->remove('patient');
+            // dd($session->get('patient'));
+        }
+        /** @var User $user */
+        $user = $this->getUser();
+
+        /** @var Patient $patient */
+        $patient = $this->patRepo->findOneByCode($code);
+        if (!$patient->isIsActive()) {
+            $this->addFlash('danger', 'Patient est inactif, des sessions sont indisponible');
+            return $this->redirectToRoute('therapist_patients_get_one', [
+                'code' => $code,
+            ]);
+        }
+        $session->set('patient', $patient);
+        return $this->redirectToRoute('app_therapist_session_index', []);
+    }
+
     #[Route('/{code}/update', name: "therapist_patients_update_one")]
     public function updatePatientByCode($code, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
@@ -156,7 +180,7 @@ class PatientController extends AbstractController
         /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
-        if (!$patient->isIsActive()) {  
+        if (!$patient->isIsActive()) {
             $this->addFlash('danger', 'Dossier ' . $code . ' est inactif! Il est interdit changer les données du patient!');
 
             return $this->redirectToRoute('therapist_patients_get_one', [
@@ -213,7 +237,7 @@ class PatientController extends AbstractController
         /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
-        if (!$patient->isIsActive()) {  
+        if (!$patient->isIsActive()) {
             $this->addFlash('danger', 'Dossier ' . $code . ' est déjà inactif!');
 
             return $this->redirectToRoute('therapist_patients_get_one', [
@@ -241,7 +265,6 @@ class PatientController extends AbstractController
             return $this->redirectToRoute('therapist_patients_get_one', [
                 'code' => $code
             ]);
-
         } else if ($form->isSubmitted() && !$form->isValid()) {
             $this->addFlash('danger', 'Mot de passe est incorrect!');
         }
@@ -260,14 +283,14 @@ class PatientController extends AbstractController
         /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
-        if (!$patient->isIsActive()) {  
+        if (!$patient->isIsActive()) {
             $this->addFlash('danger', 'Dossier ' . $code . ' est inactif!');
 
             return $this->redirectToRoute('therapist_patients_get_one', [
                 'code' => $code
             ]);
         }
-        
+
         $note = new Note();
 
         $form = $this->createForm(NoteFormType::class);
@@ -291,7 +314,6 @@ class PatientController extends AbstractController
             return $this->redirectToRoute('therapist_patients_get_one', [
                 'code' => $code
             ]);
-
         } else if ($form->isSubmitted() && !$form->isValid()) {
             $this->addFlash('danger', 'Somùething went wrong');
         }
@@ -311,14 +333,14 @@ class PatientController extends AbstractController
         /** @var Patient $patient */
         $patient = $this->patRepo->findOneByCode($code);
 
-        if (!$patient->isIsActive()) {  
+        if (!$patient->isIsActive()) {
             $this->addFlash('danger', 'Dossier ' . $code . ' est inactif!');
 
             return $this->redirectToRoute('therapist_patients_get_one', [
                 'code' => $code
             ]);
         }
-        
+
         $note = $this->noteRepo->findOneById($noteId);
 
 

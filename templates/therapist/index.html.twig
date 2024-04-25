@@ -4,7 +4,7 @@
 {% if app.request.getPathInfo starts with '/therapist/profile' %}
 Profile {{ app.user.email }}
 {% elseif app.request.getPathInfo starts with '/therapist/patients' %}
-Lis of {{ app.user.email }} patients
+List of {{ app.user.email }} patients
 {% endif %}
 {% endblock %}
 

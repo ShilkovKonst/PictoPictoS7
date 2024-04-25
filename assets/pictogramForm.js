@@ -1,8 +1,14 @@
+import { Dropdown } from 'flowbite';
+
 let isSetted = false;
-const updatePathRegex = /^\/therapist\/pictograms\/\w+\/update$/
+const updatePathRegex = /^\/therapist\/pictograms\/\w+\/update$/;
 
 window.addEventListener("click", () => {
-  if ((location.pathname == "/therapist/pictograms/create" || updatePathRegex.test(location.pathname)) && !isSetted) {
+  if (
+    (location.pathname == "/therapist/pictograms/create" ||
+      updatePathRegex.test(location.pathname)) &&
+    !isSetted
+  ) {
     isSetted = true;
 
     const irregularCheckbox = document.getElementById(
@@ -163,8 +169,7 @@ window.addEventListener("click", () => {
     });
 
     pictogram_form_type.addEventListener("change", () => {
-      
-    console.log('from inside listener', isSetted)
+      console.log("from inside listener", isSetted);
       // setting all to initial state
       irregularCheckbox.checked = false;
       setAllToInitial(
@@ -251,11 +256,18 @@ window.addEventListener("click", () => {
       }
     });
 
-    if (location.pathname != "/therapist/pictograms/create" || !updatePathRegex.test(location.pathname)) {
+    if (
+      location.pathname != "/therapist/pictograms/create" &&
+      !updatePathRegex.test(location.pathname)
+    ) {
       pictogram_form_type.removeEventListener();
       irregularCheckbox.removeEventListener();
     }
-  } else if ((location.pathname != "/therapist/pictograms/create" || !updatePathRegex.test(location.pathname)) && isSetted) {
+  } else if (
+    (location.pathname != "/therapist/pictograms/create" ||
+      !updatePathRegex.test(location.pathname)) &&
+    isSetted
+  ) {
     isSetted = false;
   }
 });
@@ -309,4 +321,126 @@ const setAllToInitial = (
   irregularGenre.style.display = "none";
   pictogram_form_feminin.value = "";
   pictogram_form_feminin.removeAttribute("required");
+};
+
+const setInitialAttributes = (
+  irregularCheckbox,
+  pictogram_form_type,
+  pictoPlaceholderEmpty,
+  pictoPlaceholderInvariable,
+  irregularFields,
+  irregularVerb,
+  pictogram_form_participe_passe,
+  conjugationPresent,
+  conjugationFutur,
+  pictogram_form_present_firstPersonSingular,
+  pictogram_form_present_firstPersonPlurial,
+  pictogram_form_present_secondPersonSingular,
+  pictogram_form_present_secondPersonPlurial,
+  pictogram_form_present_thirdPersonSingular,
+  pictogram_form_present_thirdPersonPlurial,
+  pictogram_form_futur_firstPersonSingular,
+  pictogram_form_futur_firstPersonPlurial,
+  pictogram_form_futur_secondPersonSingular,
+  pictogram_form_futur_secondPersonPlurial,
+  pictogram_form_futur_thirdPersonSingular,
+  pictogram_form_futur_thirdPersonPlurial,
+  irregularNumber,
+  pictogram_form_pluriel,
+  irregularGenre,
+  pictogram_form_feminin
+) => {
+  if (irregularCheckbox.checked) {
+    irregularFields.style.display = "block";
+
+    if (pictogram_form_type.value == "verbe") {
+      irregularVerb.style.display = "block";
+      pictogram_form_participe_passe.setAttribute("required", "");
+      conjugationPresent.style.display = "block";
+      conjugationFutur.style.display = "block";
+    } else {
+      irregularVerb.style.display = "none";
+      pictogram_form_participe_passe.removeAttribute("required");
+      conjugationPresent.style.display = "none";
+      conjugationFutur.style.display = "none";
+    }
+
+    if (
+      pictogram_form_type.value == "nom" ||
+      pictogram_form_type.value == "adjectif"
+    ) {
+      irregularNumber.style.display = "block";
+      pictogram_form_pluriel.setAttribute("required", "");
+    } else {
+      irregularNumber.style.display = "none";
+      pictogram_form_pluriel.removeAttribute("required");
+    }
+
+    if (pictogram_form_type.value == "adjectif") {
+      irregularGenre.style.display = "block";
+      pictogram_form_feminin.setAttribute("required", "");
+    } else {
+      irregularGenre.style.display = "none";
+      pictogram_form_feminin.removeAttribute("required");
+    }
+  }
+
+  if (pictogram_form_type.value != "") {
+    pictoPlaceholderEmpty.style.display = "none";
+  } else {
+    pictoPlaceholderEmpty.style.display = "block";
+  }
+
+  if (
+    pictogram_form_type.value == "invariable" ||
+    pictogram_form_type.value == "interrogatif" ||
+    pictogram_form_type.value == "adjectif"
+  ) {
+    pictoPlaceholderInvariable.style.display = "block";
+  } else {
+    pictoPlaceholderInvariable.style.display = "none";
+  }
+
+  if (
+    pictogram_form_type.value == "verbe" ||
+    pictogram_form_type.value == "nom" ||
+    pictogram_form_type.value == "adjectif"
+  ) {
+    irregularId.style.display = "block";
+  } else {
+    irregularId.style.display = "none";
+  }
+
+  if (pictogram_form_type.value == "verbe") {
+    pictogram_form_verbe.style.display = "grid";
+    pictogram_form_verbe_0.setAttribute("required", "");
+    pictogram_form_verbe_1.setAttribute("required", "");
+  } else {
+    pictogram_form_verbe.style.display = "none";
+    pictogram_form_verbe_0.removeAttribute("required");
+    pictogram_form_verbe_1.removeAttribute("required");
+  }
+
+  if (
+    pictogram_form_type.value == "nom" ||
+    pictogram_form_type.value == "pronom_ou_determinant"
+  ) {
+    pictogram_form_nom_pronom.style.display = "grid";
+    pictogram_form_nom_pronom_0.setAttribute("required", "");
+    pictogram_form_nom_pronom_1.setAttribute("required", "");
+  } else {
+    pictogram_form_nom_pronom.style.display = "none";
+    pictogram_form_nom_pronom_0.removeAttribute("required");
+    pictogram_form_nom_pronom_1.removeAttribute("required");
+  }
+
+  if (pictogram_form_type.value == "pronom_ou_determinant") {
+    pictogram_form_pronom.style.display = "grid";
+    pictogram_form_pronom_0.setAttribute("required", "");
+    pictogram_form_pronom_1.setAttribute("required", "");
+  } else {
+    pictogram_form_pronom.style.display = "none";
+    pictogram_form_pronom_0.removeAttribute("required");
+    pictogram_form_pronom_1.removeAttribute("required");
+  }
 };

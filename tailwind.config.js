@@ -6,9 +6,22 @@ module.exports = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        'pulse_color' : {
+          '0, 100%': {
+            backgroundColor: '#1e646f',
+          },
+          '50%': {
+            backgroundColor: '#ace4e7',
+          }
+        }
+      },
       screens: {
         'tall': { 'raw': '(min-height: 768px)' },
         'medium': {'raw': '(min-height: 640px)'}
+      },
+      animation: {
+        pulse_color: 'pulse_color 3s ease-in-out infinite',
       },
       colors: {
         "pblue": "#ace4e7",
@@ -32,5 +45,7 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    // require('flowbite/plugin')
+  ],
 }

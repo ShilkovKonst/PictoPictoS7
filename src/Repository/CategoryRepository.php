@@ -37,21 +37,37 @@ class CategoryRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-       /**
-        * @return Category[] Returns an array of Category objects
-        */
-       public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir): Paginator
-       {
-           return new Paginator(
+    /**
+     * @return Category[] Returns an array of Category objects
+     */
+    public function findAllWithPaginator(int $limit, int $page, string $sortBy, string $sortDir): Paginator
+    {
+        return new Paginator(
             $this->createQueryBuilder('c')
-               ->orderBy('c.' . $sortBy, $sortDir)
-               ->setFirstResult(($page - 1) * $limit)
-               ->setMaxResults($limit)
-               ->getQuery()
-               ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
-               false
-           );
-       }
+                ->orderBy('c.' . $sortBy, $sortDir)
+                ->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->setHint(Paginator::HINT_ENABLE_DISTINCT, true),
+            false
+        );
+    }   
+
+    public function findAllSuperCategories(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.superCategory IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllSubCategories(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.superCategory IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    public function findOneBySomeField($value): ?Category
     //    {

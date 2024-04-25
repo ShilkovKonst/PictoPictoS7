@@ -2,13 +2,11 @@
   Mettre à jour pictogramme 
   <a href="{{ path('therapist_pictograms_get_one', { code }) }}">{{ pictogram.title }}</a>
 </div>
-<pre>
-  {{ dump(pictogram, pictogramForm.irregular.vars.data) }}
-</pre>
 
 {{ form_start(pictogramForm, {
 'attr': {
-'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full'
+'class': 'flex flex-col md:gap-3 justify-between items-center w-full h-full',
+'data-controller': "pictoForm"
 }
 }) }}
 <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-2">
@@ -46,19 +44,19 @@
       {{ form_row(pictogramForm.verbe, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
-      'style': pictogramForm.type.vars.data == 'verbe' ? 'display: block;' : 'display: none;'
+      'style': pictogramForm.type.vars.data == 'verbe' ? 'display: grid;' : 'display: none;'
       }
       }) }}
       {{ form_row(pictogramForm.pronom, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 border-b ms-2 text-sm font-medium text-gray-900',
-      'style': pictogramForm.type.vars.data == 'pronom_ou_determinant' ? 'display: block;' : 'display: none;'
+      'style': pictogramForm.type.vars.data == 'pronom_ou_determinant' ? 'display: grid;' : 'display: none;'
       }
       }) }}
       {{ form_row(pictogramForm.nom_pronom, {
       'attr': {
       'class': 'grid grid-cols-[20%_80%] gap-1 text-start p-2 ms-2 text-sm font-medium text-gray-900',
-      'style': pictogramForm.type.vars.data in ['nom', 'pronom_ou_determinant'] ? 'display: block;' : 'display: none;'
+      'style': pictogramForm.type.vars.data in ['nom', 'pronom_ou_determinant'] ? 'display: grid;' : 'display: none;'
       }
       }) }}
     </div>

@@ -1,33 +1,19 @@
-<form class="flex flex-wrap flex-col md:flex-row w-1/4"
-    action="{{ path('therapist_pictograms_get_all') }}" method="get">
-    <input type="hidden" name="sortBy" value="{{ sortBy }}" id="">
-    <input type="hidden" name="sortDir" value="{{ sortDir }}" id="">
-    <input type="hidden" name="page" value="{{ 1 }}" id="">
-    <input type="hidden" name="filter" value="{{ filter }}" id="">
+<button id="{{ entity }}" data-dropdown-toggle="{{ entity }}dropdown"
+    class="w-auto btn-a-table text-white h-5"
+    type="button">{{ entity }} <svg class="w-2.5 h-2.5 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+        fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+    </svg>
+</button>
 
-    <select class="font-normal bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full"
-        name="value" id="{{ entity }} ">
-        <option class="font-semibold" value="">
-            {{ app.request.query.get('filter') != filter or app.request.query.get('value') == '' ? entity : 'Réinitialiser' }}
-        </option>
+<!-- Dropdown menu -->
+<div id="{{ entity }}dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-auto max-h-80 overflow-auto">
+    <ul class="py-2 text-sm text-gray-700" aria-labelledby="{{ entity }}">
         {% for item in array %}
-        {% if item.title == app.request.query.get('value') %}
-        <option value="{{ item.title }}" selected>
-            {{ item.title }}
-        </option>
-        {% else %}
-        <option value="{{ item.title }}">
-            {{ item.title }}
-        </option>
-        {% endif %}
+        <li>
+            <a href="{{ path('therapist_pictograms_get_all', { sortBy, sortDir, page: 1, filter, value: item.title }) }}"
+                class="block px-4 py-2 hover:bg-gray-100 text-start">{{ item.title }}</a>
+        </li>
         {% endfor %}
-    </select>
-    <button type="submit" class="btn-a-table h-5 w-full">
-        <svg class="w-6 h-6 text-white " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd"
-                d="M10.271 5.575C8.967 4.501 7 5.43 7 7.12v9.762c0 1.69 1.967 2.618 3.271 1.544l5.927-4.881a2 2 0 0 0 0-3.088l-5.927-4.88Z"
-                clip-rule="evenodd" />
-        </svg>
-    </button>
-</form>
+    </ul>
+</div>

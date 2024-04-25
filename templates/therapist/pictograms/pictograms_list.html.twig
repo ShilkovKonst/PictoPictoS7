@@ -1,8 +1,8 @@
 <table class="table w-full relative">
   <thead class="border-b">
-    <tr>
-      <th class="flex flex-row justify-between items-center gap-2 md:gap-4">
-        <p class="w-1/4">Filtrer par:</p>
+    <tr class="">
+      <th class="flex flex-row justify-start items-center gap-2 md:gap-4 pb-4">
+        <p class="text-start">Filtrer par:</p>
         {% include "/therapist/_filter_table.html.twig" with { filter: 'category', entity: 'Catégorie', array:
         categories} %}
         {% include "/therapist/_filter_table.html.twig" with { filter: 'type', entity: 'Type',

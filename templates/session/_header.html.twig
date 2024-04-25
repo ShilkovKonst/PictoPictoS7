@@ -1,0 +1,17 @@
+<div class="flex flex-col items-center p-2 border-b border-gray-300">
+    {% if app.request.getPathInfo == path('app_therapist_session_index') %}
+    <img src="{{ asset('img/LogoEcam.png') }}" alt="LogoEcam.png" width="280px" class="z-10 py-5">
+    <p class="font-bold text-lg text-center">
+        Salut, {{ app.session.get('patient').firstName }} et {{ app.user.firstName }}
+    </p>
+    {% else %}
+    <img src="{{ asset('img/LogoEcam.png') }}" alt="LogoEcam.png" width="100px" class="z-10 py-2">
+    <p class="font-semibold text-sm text-start">
+        Salut,
+        <br>
+        {{ app.session.get('patient').firstName }} et {{ app.user.firstName }}
+    </p>
+    {% endif %}
+
+
+</div>

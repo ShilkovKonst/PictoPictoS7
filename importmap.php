@@ -16,10 +16,6 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    'pictogram' => [
-        'path' => './assets/pictogramForm.js',
-        'entrypoint' => true,
-    ],
     '@hotwired/stimulus' => [
         'version' => '3.2.2',
     ],
@@ -29,17 +25,30 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
-    // 'bootstrap' => [
-    //     'version' => '5.3.3',
-    // ],
-    // '@popperjs/core' => [
-    //     'version' => '2.11.8',
-    // ],
-    // 'bootstrap/dist/css/bootstrap.min.css' => [
-    //     'version' => '5.3.3',
-    //     'type' => 'css',
-    // ],
     'jquery' => [
         'version' => '3.7.1',
+    ],
+    'flowbite' => [
+        'version' => '2.3.0',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'flowbite/dist/flowbite.min.css' => [
+        'version' => '2.3.0',
+        'type' => 'css',
+    ],
+    'bootstrap' => [
+        'version' => '5.3.3',
+    ],
+    'bootstrap/dist/css/bootstrap.min.css' => [
+        'version' => '5.3.3',
+        'type' => 'css',
+    ],
+    'keen-slider' => [
+        'version' => '6.8.6',
+    ],
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
 ];

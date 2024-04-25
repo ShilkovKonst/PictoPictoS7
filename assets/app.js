@@ -1,5 +1,5 @@
 import './bootstrap.js';
-import './pictogramForm.js';
+import { initFlowbite } from 'flowbite';
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -7,3 +7,10 @@ import './pictogramForm.js';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
+
+document.addEventListener('turbo:render', () => {
+    initFlowbite();
+});
+document.addEventListener('turbo:frame-render', () => {
+    initFlowbite();
+});
