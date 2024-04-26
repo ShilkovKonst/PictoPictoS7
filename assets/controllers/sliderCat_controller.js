@@ -17,11 +17,17 @@ export default class extends Controller {
     const category = params.get("category");
 
     const activeCategory = document.getElementById(category);
-    activeCategory.classList.add('border', 'border-pred', 'border-4', 'rounded-3xl')
-    const slide = category
-      ? activeCategory.dataset.slide
-      : 0;
 
+    if (activeCategory) {
+      activeCategory.classList.add(
+        "border",
+        "border-pred",
+        "border-4",
+        "rounded-3xl"
+      );
+    }
+
+    const slide = category ? activeCategory.dataset.slide : 0;
     const slider = document.getElementById("category");
     slider.classList.add("h-0");
     this.timeoutId = setTimeout(() => {

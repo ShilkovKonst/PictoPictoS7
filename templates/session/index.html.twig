@@ -11,7 +11,7 @@ Session with {{ app.session.get('patient').firstName }} {{ app.session.get('pati
     <div
         class="flex flex-col justify-between items-center w-full sm:w-5/6 md:w-4/5 lg:w-2/3 xl:w-1/2 h-full bg-pform sm:rounded-xl overflow-hidden ml-auto mr-auto p-4">
         {% include "session/_header.html.twig" %}
-        <div class="flex flex-col gap-10 justify-center items-center w-full p-4 md:p-8 lg:p-12 bg-[#e5e9ec]">
+        <div class="flex flex-col gap-6 justify-center items-center w-full p-4 md:p-8 lg:p-12 bg-[#e5e9ec]">
             {% include "session/_index_section.html.twig" with {
             path: 'app_therapist_session_dialogue',
             title: 'Dialogue' } %}
@@ -53,7 +53,7 @@ Session with {{ app.session.get('patient').firstName }} {{ app.session.get('pati
         {% set i = 0 %}
         {% if subCats|length is not same as(0) %}
         <div data-controller="sliderSubcat" id="subcategory" class=" overflow-hidden">
-            <div id="subcategory-slider" class="keen-slider mb-5">
+            <div id="subcategory-slider" class="keen-slider mb-3">
                 {% for scat in subCats %}
                 <div class="keen-slider__slide min-w-24 min-h-24 p-3" data-slide="{{ i }}" id="{{ scat.id }}">
                     <a class=" flex justify-center items-center rounded-2xl overflow-hidden"
@@ -68,8 +68,8 @@ Session with {{ app.session.get('patient').firstName }} {{ app.session.get('pati
         {% endif %}
 
         {% if pictograms|length is not same as(0) %}
-        <div data-controller="sliderPicto" id="picto" class="overflow-hidden">
-            <div id="pictogram-slider" class="keen-slider">
+        <div data-controller="sliderPicto" id="picto" class="overflow-hidden border-t">
+            <div id="pictogram-slider" class="keen-slider my-3">
                 {% for picto in pictograms %}
                 <div class="keen-slider__slide min-w-24 min-h-24 p-3">
                     {# <a href="{{ path('app_therapist_session_exchange', { category: catFilter, subcategory: subcatFilter }) }}" #}

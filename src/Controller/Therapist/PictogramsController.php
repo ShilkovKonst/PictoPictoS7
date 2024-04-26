@@ -354,12 +354,10 @@ class PictogramsController extends AbstractController
             }
             // dd($pictogram);
             $entityManager->persist($pictogram);
-            $entityManager->flush();
-
-            $id = $this->pictRepo->findOneByFilename($pictogram->getFilename($newFileName))->getId();
+            $entityManager->flush();            
 
             return $this->redirectToRoute("therapist_pictograms_get_one", [
-                'code' => $id
+                'code' => $code
             ]);
         } else if ($form->isSubmitted() && !$form->isValid()) { // if something went wrong - generate and send to front all the errors to show to the user
             $errors = $form->getErrors(true);

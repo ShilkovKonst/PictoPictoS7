@@ -14,7 +14,18 @@ export default class extends Controller {
     const subcategory = params.get("subcategory");
     const slide = subcategory != 'none'
       ? document.getElementById(subcategory).dataset.slide
-      : 0;
+      : 0;      
+
+    const activeCategory = document.getElementById(subcategory);
+
+    if (activeCategory) {
+      activeCategory.classList.add(
+        "border",
+        "border-pred",
+        "border-4",
+        "rounded-3xl"
+      );
+    }
 
     const slider = document.getElementById("subcategory");
     slider.classList.add('h-0');
