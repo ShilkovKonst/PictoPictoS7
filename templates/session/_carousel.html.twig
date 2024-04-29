@@ -1,0 +1,39 @@
+{% set i = 0 %}
+<div data-controller="{{ controller }}" id="{{ id }}" class=" overflow-hidden">
+    <div id="{{ containerId }}" class="keen-slider mb-5">
+        {% for e in DataArray %}
+        <div class="keen-slider__slide p-3 flex justify-center items-center" id="{{ e.id }}"
+            data-controller="textToSpeech" data-slide="{{ i }}">
+            {% if containerId is same as('category-slider') %}
+            <a class=" flex justify-center items-center rounded-2xl overflow-hidden hover:border-2 border-pred w-24 h-24"
+                href="{{ path('app_therapist_session_exchange', { category: e.id, subcategory: 'none' }) }}"
+                data-textToSpeech-title-param="{{ e.title }}" data-action="click->textToSpeech#toSpeech">
+                <img src="{{ asset('img/cat/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square">
+            </a>
+            {% endif %}
+            {% if containerId is same as('subcategory-slider') %}
+            <a class=" flex justify-center items-center rounded-2xl overflow-hidden hover:border-2 border-pred w-24 h-24"
+                href="{{ path('app_therapist_session_exchange', { category: catFilter, subcategory: e.id }) }}"
+                data-textToSpeech-title-param="{{ e.title }}" data-action="click->textToSpeech#toSpeech">
+                <img src="{{ asset('img/cat/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square">
+            </a>
+            {% endif %}
+            {% if containerId is same as('pictogram-slider') %}
+            <div class=" flex justify-center items-center rounded-2xl overflow-hidden cursor-grab w-24 h-24"
+                data-textToSpeech-title-param="{{ e.title }}" data-action="click->textToSpeech#toSpeech">
+                <img src="{{ asset('img/picto/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square" 
+                draggable="true" data-controller="dragAndDrop" 
+                data-action="dragstart->dragAndDrop#dragPicto dragend->dragAndDrop#testPicto"
+                data-dragAndDrop-id-param="{{ e.id }}" 
+                data-dragAndDrop-title-param="{{ e.title }}" 
+                data-dragAndDrop-alt-param="{{ e.filename }}"
+                data-dragAndDrop-image-param="{{ asset('img/picto/' ~ e.filename) }}"
+                >
+            </div>
+            {% endif %}
+        </div>
+        {% set i = i + 1 %}
+        {% endfor %}
+    </div>
+    <div id="{{ numberSlidesId }}" class="hidden" data-slides="{{ i }}"></div>
+</div>

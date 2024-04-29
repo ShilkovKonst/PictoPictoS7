@@ -10,7 +10,7 @@
     -ms-touch-action: pan-y;
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
-    width: 90%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
 }

@@ -1,0 +1,37 @@
+{% include "session/_carousel.html.twig" with {
+controller: 'sliderCat',
+id: 'category',
+containerId: 'category-slider',
+DataArray: superCats, numberSlidesId: 'catSlides'
+} %}
+
+{% if subCats|length is not same as(0) %}
+{% include "session/_carousel.html.twig" with {
+controller: 'sliderSubcat',
+id: 'subcategory',
+containerId: 'subcategory-slider',
+DataArray: subCats,
+numberSlidesId: 'subcatSlides'
+} %}
+{% endif %}
+
+{% if pictograms|length is not same as(0) %}
+{% include "session/_carousel.html.twig" with {
+controller: 'sliderPicto',
+id: 'picto',
+containerId: 'pictogram-slider',
+DataArray: pictograms,
+numberSlidesId: 'pictoSlides'
+} %}
+{% endif %}
+
+<div class="flex flex-row flex-wrap justify-start gap-x-[4%] gap-y-3 items-center w-full p-3 pt-5 border-t">
+  {% for i in range(0, 9) %}
+  <div class="relative flex justify-center items-center rounded-2xl overflow-hidden w-24 h-24 border z-10"
+    data-controller="dragAndDrop"
+    data-action="dragenter->dragAndDrop#highlightDropZone dragover->dragAndDrop#dragPictoOverDropZone dragleave->dragAndDrop#dehighlightDropZone drop->dragAndDrop#cloneAndDropPicto"
+    >
+    <p class="absolute ">{{ i }}</p>
+  </div>
+  {% endfor %}
+</div>

@@ -106,7 +106,6 @@ export default class extends Controller {
     );
 
     const irregularId = document.getElementById("irregularId");
-
     
     setTagPlaceholder(
       pictogram_form_type,

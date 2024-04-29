@@ -7,11 +7,20 @@ export default class extends Controller {
     this.timeoutId = null; // Initialize timeout ID variable
   }
   connect() {
+    const sliderContainer = document.getElementById("pictogram-slider");
+
+    let sliderWidth;
+    sliderContainer.addEventListener("resize", () => {
+      sliderWidth = sliderContainer.offsetWidth;
+    });
+
     const slider = document.getElementById("picto");
     slider.classList.add("h-0");
     this.timeoutId = setTimeout(() => {
       slider.classList.remove("h-0");
     }, 1);
+
+    const slidesNum = document.getElementById("pictoSlides").dataset.slides;
 
     new KeenSlider(
       "#pictogram-slider",
@@ -19,43 +28,67 @@ export default class extends Controller {
         drag: false,
         breakpoints: {
           "(max-width: 399px)": {
+            loop: false,
             slides: {
               perView: 1,
-              // spacing: 0,
             },
           },
           "(min-width: 400px) and (max-width: 639px)": {
+            loop: slidesNum > 2,
             slides: {
-              perView: 2,
-              // spacing: 10,
+              perView: slidesNum < 2 ? Number(slidesNum) : 2,
+              spacing: sliderSpacer(
+                slidesNum < 2 ? Number(slidesNum) : 2,
+                108,
+                sliderWidth
+              ),
             },
           },
           "(min-width: 640px) and (max-width: 767px)": {
+            loop: slidesNum > 3,
             slides: {
-              perView: 3,
-              // spacing: 20,
+              perView: slidesNum < 3 ? Number(slidesNum) : 3,
+              spacing: sliderSpacer(
+                slidesNum < 3 ? Number(slidesNum) : 3,
+                108,
+                sliderWidth
+              ),
             },
           },
           "(min-width: 768px) and (max-width: 1023px)": {
+            loop: slidesNum > 4,
             slides: {
-              perView: 4,
-              // spacing: 20,
+              perView: slidesNum < 4 ? Number(slidesNum) : 4,
+              spacing: sliderSpacer(
+                slidesNum < 4 ? Number(slidesNum) : 4,
+                108,
+                sliderWidth
+              ),
             },
           },
           "(min-width: 1024px) and (max-width: 1279px)": {
+            loop: slidesNum > 6,
             slides: {
-              perView: 6,
-              // spacing: 20,
+              perView: slidesNum < 6 ? Number(slidesNum) : 6,
+              spacing: sliderSpacer(
+                slidesNum < 6 ? Number(slidesNum) : 6,
+                108,
+                sliderWidth
+              ),
             },
           },
           "(min-width: 1280px)": {
+            loop: slidesNum > 8,
             slides: {
-              perView: 8,
-              // spacing: 20,
+              perView: slidesNum < 8 ? Number(slidesNum) : 8,
+              spacing: sliderSpacer(
+                slidesNum < 8 ? Number(slidesNum) : 8,
+                108,
+                sliderWidth
+              ),
             },
           },
         },
-        loop: true,
       },
       [navigation]
     );
@@ -93,10 +126,50 @@ function navigation(slider) {
       removeElement(arrowRight);
       return;
     }
-    arrowLeft = createDiv("arrow arrow--left");
+    arrowLeft = createDiv(
+      "arrow arrow--left rounded-xl border-4 border-pbg bg-pblue hover:bg-pred transition duration-300 ease-in-out"
+    );
     arrowLeft.addEventListener("click", () => slider.prev());
-    arrowRight = createDiv("arrow arrow--right");
+    arrowLeft.addEventListener("click", () => slider.prev());
+    const svgLeft = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+    svgLeft.classList.add("w-7", "h-7", "text-black");
+    svgLeft.setAttribute("viewBox", "0 0 320 512");
+    const pathLeft = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+    pathLeft.setAttribute(
+      "d",
+      "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"
+    );
+    pathLeft.setAttribute("fill", "currentColor");
+    svgLeft.appendChild(pathLeft);
+    arrowLeft.appendChild(svgLeft);
+
+    arrowRight = createDiv(
+      "arrow arrow--right rounded-xl border-4 border-pbg bg-pblue hover:bg-pred transition duration-300 ease-in-out"
+    );
     arrowRight.addEventListener("click", () => slider.next());
+    const svgRight = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+    svgRight.classList.add("w-7", "h-7", "text-black");
+    svgRight.setAttribute("viewBox", "0 0 320 512");
+    const pathRight = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+    pathRight.setAttribute(
+      "d",
+      "M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
+    );
+    pathRight.setAttribute("fill", "currentColor");
+    svgRight.appendChild(pathRight);
+    arrowRight.appendChild(svgRight);
 
     wrapper.appendChild(arrowLeft);
     wrapper.appendChild(arrowRight);
@@ -115,30 +188,19 @@ function navigation(slider) {
     wrapper.appendChild(slider.container);
   }
 
-  function updateClasses() {
-    var slide = slider.track.details.rel;
-    slide === 0
-      ? arrowLeft.classList.add("arrow--disabled")
-      : arrowLeft.classList.remove("arrow--disabled");
-    slide === slider.track.details.slides.length - 1
-      ? arrowRight.classList.add("arrow--disabled")
-      : arrowRight.classList.remove("arrow--disabled");
-  }
-
   slider.on("created", () => {
     markup();
-    updateClasses();
   });
   slider.on("optionsChanged", () => {
-    console.log(2);
     markup(true);
     markup();
-    updateClasses();
   });
-  slider.on("slideChanged", () => {
-    updateClasses();
-  });
+  slider.on("slideChanged", () => {});
   slider.on("destroyed", () => {
     markup(true);
   });
 }
+
+const sliderSpacer = (perView, slideWidth, sliderWidth) => {
+  return (sliderWidth - slideWidth * perView) / (perView - 1);
+};

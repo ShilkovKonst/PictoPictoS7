@@ -34,58 +34,10 @@ Session with {{ app.session.get('patient').firstName }} {{ app.session.get('pati
     <div class="pr-40 pt-5 w-full">
         {% if app.request.getPathInfo == path('app_therapist_session_exchange') %}
 
-        {% set i = 0 %}
-        <div data-controller="sliderCat" id="category" class=" overflow-hidden">
-            <div id="category-slider" class="keen-slider mb-5">
-                {% for cat in superCats %}
-                <div class="keen-slider__slide min-w-24 min-h-24 p-3" data-slide="{{ i }}" id="{{ cat.id }}">
-                    <a class=" flex justify-center items-center rounded-2xl overflow-hidden"
-                        href="{{ path('app_therapist_session_exchange', { category: cat.id, subcategory: 'none' }) }}">
-                        <img src="{{ asset('img/cat/' ~ cat.filename) }}" alt="{{ cat.filename }}"
-                            class="aspect-square">
-                    </a>
-                </div>
-                {% set i = i + 1 %}
-                {% endfor %}
-            </div>
-        </div>
-        
-        {% set i = 0 %}
-        {% if subCats|length is not same as(0) %}
-        <div data-controller="sliderSubcat" id="subcategory" class=" overflow-hidden">
-            <div id="subcategory-slider" class="keen-slider mb-3">
-                {% for scat in subCats %}
-                <div class="keen-slider__slide min-w-24 min-h-24 p-3" data-slide="{{ i }}" id="{{ scat.id }}">
-                    <a class=" flex justify-center items-center rounded-2xl overflow-hidden"
-                        href="{{ path('app_therapist_session_exchange', { category: catFilter, subcategory: scat.id }) }}">
-                        <img src="{{ asset('img/cat/' ~ scat.filename) }}" alt="{{ scat.filename }}">
-                    </a>
-                </div>
-                {% set i = i + 1 %}
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+        {% include "session/section_exchange.html.twig" %}
 
-        {% if pictograms|length is not same as(0) %}
-        <div data-controller="sliderPicto" id="picto" class="overflow-hidden border-t">
-            <div id="pictogram-slider" class="keen-slider my-3">
-                {% for picto in pictograms %}
-                <div class="keen-slider__slide min-w-24 min-h-24 p-3">
-                    {# <a href="{{ path('app_therapist_session_exchange', { category: catFilter, subcategory: subcatFilter }) }}" #}
-                        {# class=" flex justify-center items-center rounded-2xl overflow-hidden"> #}
-                        <div class=" flex justify-center items-center rounded-2xl overflow-hidden cursor-grab">
-                            <img src="{{ asset('img/picto/' ~ picto.filename) }}" alt="{{ picto.filename }}">
-                        </div>                        
-                    {# </a> #}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
         {% endif %}
-
     </div>
-    {% endif %}
 
     {# sidebar to operate #}
     {% include "session/_section_sidebar.html.twig" %}
