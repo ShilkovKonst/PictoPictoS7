@@ -19,11 +19,12 @@
             </a>
             {% endif %}
             {% if containerId is same as('pictogram-slider') %}
-            <div class=" flex justify-center items-center rounded-2xl overflow-hidden cursor-grab w-24 h-24"
-                data-textToSpeech-title-param="{{ e.title }}" data-action="click->textToSpeech#toSpeech">
+            <div class=" flex justify-center items-center rounded-2xl overflow-hidden cursor-grab w-24 h-24">
                 <img src="{{ asset('img/picto/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square" 
-                draggable="true" data-controller="dragAndDrop" 
-                data-action="dragstart->dragAndDrop#dragPicto dragend->dragAndDrop#testPicto"
+                draggable="true" 
+                data-controller="dragAndDrop" 
+                data-action="click->textToSpeech#toSpeech dragstart->dragAndDrop#dragStartPicto dragend->dragAndDrop#dragEndPicto"
+                data-textToSpeech-title-param="{{ e.title }}" 
                 data-dragAndDrop-id-param="{{ e.id }}" 
                 data-dragAndDrop-title-param="{{ e.title }}" 
                 data-dragAndDrop-alt-param="{{ e.filename }}"
