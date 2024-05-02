@@ -5,7 +5,7 @@ Session with {{ app.session.get('patient').firstName }} {{ app.session.get('pati
 {% endblock %}
 
 {% block body %}
-<div class="sm:min-h-screen bg-pbg relative">
+<div class="min-h-screen bg-pbg relative">
     {# index page of session #}
     {% if app.request.getPathInfo == path('app_therapist_session_index') %}
     <div
