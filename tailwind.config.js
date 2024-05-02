@@ -16,10 +16,10 @@ module.exports = {
           }
         }
       },
-      screens: {
-        'tall': { 'raw': '(min-height: 768px)' },
-        'medium': {'raw': '(min-height: 640px)'}
-      },
+      // screens: {
+      //   'tall': { 'raw': '(min-height: 768px)' },
+      //   'medium': {'raw': '(min-height: 640px)'}
+      // },
       animation: {
         pulse_color: 'pulse_color 3s ease-in-out infinite',
       },

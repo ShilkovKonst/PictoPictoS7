@@ -1,76 +1,122 @@
 import { Controller } from "@hotwired/stimulus";
 
-export default class extends Controller {
-  isSame = false;
+export default class DnD extends Controller {
+  static source = null;
+  static target = null;
+  static img = null;
 
-  // for 'dragstart' and 'dragEnd' event on source (draggable)
-  dragStartPicto(e) {
-    if (e.target.parentNode.classList.contains("dropzone")) {
-      e.dataTransfer.setData(
-        "sourceParentId",
-        e.target.parentNode.dataset.number
-      );
-    }
-    e.dataTransfer.setData("id", e.params.id);
-    e.dataTransfer.setData("title", e.params.title);
-    e.dataTransfer.setData("image", e.params.image);
-    e.dataTransfer.setData("alt", e.params.alt);
-    e.dataTransfer.effectAllowed = "move";
-  }
-  dragEndPicto(e) {
-    if (e.target.parentNode.classList.contains("dropzone")) {
-      e.target.remove();
-    }    
-  }
-
-  // for 'dragover' event on target (drop zone)
-  // e.preventDefault() required for drag'n'drop to work
-  dragPictoOverDropZone(e) {
+  touchStartPicto(e) {
     e.preventDefault();
-  }
 
-  // for 'dragenter' and 'dragleave' events on target (drop zone)
-  highlightDropZone(e) {   
-    e.target.style.borderColor = "red";
-  }
-  dehighlightDropZone(e) {
-    e.dataTransfer.setData("targetParentId", "");
-    e.target.style.borderColor = "";
-  }
+    // textToSpeech    
+    let talk = new SpeechSynthesisUtterance();
+    talk.text = e.params.title;
+    talk.lang = "fr-FR";
+    speechSynthesis.speak(talk);
 
-  // for 'drop' event on target (drop zone)
-  cloneAndDropPicto(e) {
-    const img = document.createElement("img");
-    img.src = e.dataTransfer.getData("image");
-    img.alt = e.dataTransfer.getData("alt");
-    img.draggable = true;
+    if (e.target.parentNode.classList.contains("dropzone")) {
+      DnD.source = e.target.parentNode;
+    }
+    DnD.img = e.target;
+    console.log(DnD.source, DnD.target);
 
-    img.dataset.id = e.dataTransfer.getData("id");
-
-    img.setAttribute(
-      "data-textToSpeech-title-param",
-      e.dataTransfer.getData("title")
+    // Создаем клон изображения
+    let clone = DnD.source ? e.target : e.target.cloneNode(true);
+    // Устанавливаем стили для клонированного изображения
+    clone.classList.add(
+      "rounded-2xl",
+      "w-24",
+      "h-24",
+      "opacity-50",
+      "cursor-grabbing",
+      "absolute",
+      "z-100"
     );
-    img.setAttribute("data-dragAndDrop-id-param", e.dataTransfer.getData("id"));
-    img.setAttribute(
-      "data-dragAndDrop-title-param",
-      e.dataTransfer.getData("title")
-    );
-    img.setAttribute(
-      "data-dragAndDrop-alt-param",
-      e.dataTransfer.getData("alt")
-    );
-    img.setAttribute(
-      "data-dragAndDrop-image-param",
-      e.dataTransfer.getData("image")
-    );
+    document.body.appendChild(clone);
 
-    img.classList.add("aspect-square", "cursor-grab");
-    img.dataset.controller = "dragAndDrop textToSpeech";
-    img.dataset.action =
-      "dragstart->dragAndDrop#dragStartPicto dragend->dragAndDrop#dragEndPicto click->textToSpeech#toSpeech";
+    // Устанавливаем начальные координаты для перетаскивания
+    let offsetX = (e.type == "mousedown" ? e.clientX : e.changedTouches[0].clientX) - e.target.getBoundingClientRect().left;
+    let offsetY = (e.type == "mousedown" ? e.clientY : e.changedTouches[0].clientY) - e.target.getBoundingClientRect().top;
+    
+    e.type == "mousedown" ? moveAt(e.clientX, e.clientY) : moveAt(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
 
-    e.target.appendChild(img);
-    e.target.style.borderColor = "";
+    let currentDropzone = null;
+
+    // Добавляем обработчики событий для движения мыши и отпускания кнопки
+    if (e.type == 'mousedown') {
+      document.addEventListener("mousemove", touchMovePicto);
+      document.addEventListener("mouseup", touchEndPicto);
+    } else {
+      document.addEventListener("touchmove", touchMovePicto);
+      document.addEventListener("touchend", touchEndPicto);
+    }
+
+    function touchMovePicto(e) {
+      e.type == "mousemove" ? moveAt(e.clientX, e.clientY) : moveAt(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      clone.hidden = true;
+      let elemBelow =
+        e.type == "mousemove"
+          ? document.elementFromPoint(e.clientX, e.clientY)
+          : document.elementFromPoint(
+              e.changedTouches[0].clientX,
+              e.changedTouches[0].clientY
+            );
+      clone.hidden = false;
+
+      if (!elemBelow) return;
+
+      let closestDropzone = elemBelow.closest(".dropzone");
+
+      if (currentDropzone != closestDropzone) {
+        if (currentDropzone) {
+          // логика обработки процесса "вылета" из droppable (удаляем подсветку)
+          currentDropzone.style.borderColor = "";
+        }
+        currentDropzone = closestDropzone;
+        if (currentDropzone) {
+          // логика обработки процесса, когда мы "влетаем" в элемент droppable
+          currentDropzone.style.borderColor = "#e58463";
+        }
+      }
+    }
+
+    function touchEndPicto(e) {
+      if (e.type == 'mouseup') {
+        document.removeEventListener("mousemove", touchMovePicto);
+        document.removeEventListener("mouseup", touchEndPicto);
+      } else {
+        document.removeEventListener("touchmove", touchMovePicto);
+        document.removeEventListener("touchend", touchEndPicto);
+      }
+      if (currentDropzone) {
+        DnD.target = currentDropzone;
+        console.log(currentDropzone);
+        // логика обработки процесса "вылета" из droppable (удаляем подсветку)
+        currentDropzone.style.borderColor = "";
+        clone.classList.remove(
+          "rounded-2xl",
+          "w-24",
+          "h-24",
+          "opacity-50",
+          "cursor-grabbing",
+          "absolute",
+          "z-100"
+        );
+        clone.classList.add("cursor-grab");
+        currentDropzone.appendChild(clone);
+      } else {
+        // Удаляем клон изображения
+        clone.parentNode.removeChild(clone);
+      }
+      console.log(DnD.source, DnD.target);
+      DnD.source = null;
+      DnD.target = null;
+      DnD.img = null;
+    }
+
+    function moveAt(clientX, clientY) {
+      clone.style.left = clientX - offsetX + "px";
+      clone.style.top = clientY - offsetY + "px";
+    }
   }
 }

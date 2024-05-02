@@ -3,7 +3,7 @@
     <div id="{{ containerId }}" class="keen-slider mb-5">
         {% for e in DataArray %}
         <div class="keen-slider__slide p-3 flex justify-center items-center" id="{{ e.id }}"
-            data-controller="textToSpeech" data-slide="{{ i }}">
+            data-controller="textToSpeech dragAndDrop" data-slide="{{ i }}">
             {% if containerId is same as('category-slider') %}
             <a class=" flex justify-center items-center rounded-2xl overflow-hidden hover:border-2 border-pred w-24 h-24"
                 href="{{ path('app_therapist_session_exchange', { category: e.id, subcategory: 'none' }) }}"
@@ -20,10 +20,10 @@
             {% endif %}
             {% if containerId is same as('pictogram-slider') %}
             <div class=" flex justify-center items-center rounded-2xl overflow-hidden cursor-grab w-24 h-24">
-                <img src="{{ asset('img/picto/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square" 
+                <img src="{{ asset('img/picto/' ~ e.filename) }}" alt="{{ e.filename }}" class="aspect-square" id="pictoList{{ e.id }}"
                 draggable="true" 
-                data-controller="dragAndDrop" 
-                data-action="click->textToSpeech#toSpeech dragstart->dragAndDrop#dragStartPicto dragend->dragAndDrop#dragEndPicto"
+                data-action="mousedown->dragAndDrop#touchStartPicto touchstart->dragAndDrop#touchStartPicto click->textToSpeech#toSpeech"
+                {# data-action="click->textToSpeech#toSpeech dragstart->dragAndDrop#dragStartPicto dragend->dragAndDrop#dragEndPicto touchstart->dragAndDrop#touchHandler" #}
                 data-textToSpeech-title-param="{{ e.title }}" 
                 data-dragAndDrop-id-param="{{ e.id }}" 
                 data-dragAndDrop-title-param="{{ e.title }}" 
